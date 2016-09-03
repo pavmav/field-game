@@ -45,6 +45,11 @@ class Field(object):
         entity_object.x = x
         entity_object.y = y
 
+    def make_time(self):
+        for y in range(self.height):
+            for x in range(self.length):
+                for element in self.field[y][x]:
+                    element.act()
 
 # f = Field(20, 6)
 #

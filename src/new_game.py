@@ -43,7 +43,7 @@ def main():
     timer = pygame.time.Clock()
 
     while 1: # Основной цикл программы
-        timer.tick(10)
+        timer.tick(5)
         for e in pygame.event.get(): # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
@@ -51,8 +51,10 @@ def main():
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">
-        c.wander()
-        g.wander()
+
+        f.make_time()
+        #c.act()
+        #g.act()
         level = f.list_str_representation()
         # </editor-fold>
 
