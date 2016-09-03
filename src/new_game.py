@@ -51,8 +51,8 @@ def main():
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">
-        c.wander(f)
-        g.wander(f)
+        c.wander()
+        g.wander()
         level = f.list_str_representation()
         # </editor-fold>
 

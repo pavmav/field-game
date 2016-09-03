@@ -41,22 +41,23 @@ class Field(object):
         else:
             self.field[y][x][-1] = entity_object
 
+        entity_object.board = self
         entity_object.x = x
         entity_object.y = y
 
 
-#f = Field(20, 6)
-
-#b = Block()
-#g = Creature()
-#c = Creature()
-
-#f.insert_object(5, 2, c)
-#f.insert_object(4, 2, g)
-#f.insert_object(3, 4, b)
-
-#print c.move_west(f)
-
-#for i in range(20):
-#    print c.act(f)
-#    f.print_field()
+# f = Field(20, 6)
+#
+# b = Block()
+# g = Creature()
+# c = Creature()
+#
+# f.insert_object(5, 2, c)
+# f.insert_object(4, 2, g)
+# f.insert_object(3, 4, b)
+#
+# print c.move_west(f)
+#
+# for i in range(20):
+#     print c.act(f)
+#     f.print_field()

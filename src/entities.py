@@ -7,12 +7,13 @@ class Entity(object):
         self.y = None
         self.passable = False
         self.scenery = True
+        self.board = None
         pass
 
     def __str__(self):
         raise Exception
 
-    def act(self, board):
+    def act(self):
         pass
 
 
@@ -34,33 +35,33 @@ class Creature(Entity):
     def __str__(self):
         return '@'
 
-    def act(self, board):
-        return self.wander(board)
+    def act(self):
+        return self.wander()
 
-    def move(self, x, y, board):
-        if board.field[y][x][-1].passable:
-            board.insert_object(self.x, self.y, Blank())
-            board.insert_object(x, y, self)
+    def move(self, x, y):
+        if self.board.field[y][x][-1].passable:
+            self.board.field[self.y][self.x].pop()
+            self.board.insert_object(x, y, self)
             return True
         else:
             return False
 
-    def wander(self, board):
+    def wander(self):
         possible_actions = [self.move_east, self.move_north, self.move_west, self.move_south]
         action = random.choice(possible_actions)
-        return action(board)
+        return action()
 
-    def move_north(self, board):
-        return self.move(self.x, self.y - 1, board)
+    def move_north(self):
+        return self.move(self.x, self.y - 1)
 
-    def move_south(self, board):
-        return self.move(self.x, self.y + 1, board)
+    def move_south(self):
+        return self.move(self.x, self.y + 1)
 
-    def move_east(self, board):
-        return self.move(self.x + 1, self.y, board)
+    def move_east(self):
+        return self.move(self.x + 1, self.y)
 
-    def move_west(self, board):
-        return self.move(self.x - 1, self.y, board)
+    def move_west(self):
+        return self.move(self.x - 1, self.y)
 
 
 class Blank(Entity):
