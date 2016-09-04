@@ -26,6 +26,11 @@ def main():
                                          # будем использовать как фон
     bg.fill(Color(BACKGROUND_COLOR))     # Заливаем поверхность сплошным цветом
 
+    # <editor-fold desc="Text stats">
+    # initialize font; must be called after 'pygame.init()' to avoid 'Font not Initialized' error
+    myfont = pygame.font.SysFont("monospace", 15)
+    # </editor-fold>
+
     # <editor-fold desc="Field">
     f = Field(20, 15)
 
@@ -51,9 +56,14 @@ def main():
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">
-
         f.make_time()
         level = f.list_str_representation()
+        # </editor-fold>
+
+        # <editor-fold desc="Text stats">
+        # render text
+        label = myfont.render("Epoch: {0}".format((f.epoch)), 1, (255, 255, 0))
+        screen.blit(label, (650, 10))
         # </editor-fold>
 
         x = y = 0  # координаты
