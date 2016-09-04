@@ -53,8 +53,6 @@ def main():
         # <editor-fold desc="Field">
 
         f.make_time()
-        #c.act()
-        #g.act()
         level = f.list_str_representation()
         # </editor-fold>
 

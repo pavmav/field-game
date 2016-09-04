@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from entities import *
 
 
@@ -6,15 +8,22 @@ class Field(object):
         self.length = length
         self.height = height
         self.field = []
+        self.epoch = 0
 
         for y in range(self.height):
             row = []
             self.field.append(row)
             for x in range(self.length):
                 if y == 0 or x == 0 or y == (height - 1) or x == (length - 1):
-                    row.append([Block()])
+                    init_object = Block()
                 else:
-                    row.append([Blank()])
+                    init_object = Blank()
+
+                init_object.x = x
+                init_object.y = y
+                init_object.time_position = 0
+
+                row.append([init_object])
 
     def print_field(self):
         for y in range(self.height):
@@ -41,6 +50,8 @@ class Field(object):
         else:
             self.field[y][x][-1] = entity_object
 
+        entity_object.time_position = self.epoch # TODO возможно, надо ставить следующую эпоху
+
         entity_object.board = self
         entity_object.x = x
         entity_object.y = y
@@ -49,7 +60,10 @@ class Field(object):
         for y in range(self.height):
             for x in range(self.length):
                 for element in self.field[y][x]:
-                    element.act()
+                    if element.time_position == self.epoch:
+                        element.act()
+
+        self.epoch += 1
 
 # f = Field(20, 6)
 #

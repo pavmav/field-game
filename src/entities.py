@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import random
 
 
@@ -8,12 +10,14 @@ class Entity(object):
         self.passable = False
         self.scenery = True
         self.board = None
+        self.time_position = None
         pass
 
     def __str__(self):
         raise Exception
 
     def act(self):
+        self.time_position += 1
         pass
 
 
@@ -36,7 +40,9 @@ class Creature(Entity):
         return '@'
 
     def act(self):
-        return self.wander()
+        action_result = self.wander()
+        self.time_position += 1
+        return action_result
 
     def move(self, x, y):
         if self.board.field[y][x][-1].passable:
