@@ -21,7 +21,7 @@ class Field(object):
 
                 init_object.x = x
                 init_object.y = y
-                init_object.time_position = 0
+                init_object.z = 0
 
                 row.append([init_object])
 
@@ -50,7 +50,7 @@ class Field(object):
         else:
             self.field[y][x][-1] = entity_object
 
-        entity_object.time_position = self.epoch # TODO возможно, надо ставить следующую эпоху
+        entity_object.z = self.epoch # TODO возможно, надо ставить следующую эпоху
 
         entity_object.board = self
         entity_object.x = x
@@ -60,23 +60,7 @@ class Field(object):
         for y in range(self.height):
             for x in range(self.length):
                 for element in self.field[y][x]:
-                    if element.time_position == self.epoch:
-                        element.act()
+                    if element.z == self.epoch:
+                        element.live()
 
         self.epoch += 1
-
-# f = Field(20, 6)
-#
-# b = Block()
-# g = Creature()
-# c = Creature()
-#
-# f.insert_object(5, 2, c)
-# f.insert_object(4, 2, g)
-# f.insert_object(3, 4, b)
-#
-# print c.move_west(f)
-#
-# for i in range(20):
-#     print c.act(f)
-#     f.print_field()

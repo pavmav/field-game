@@ -7,17 +7,20 @@ class Entity(object):
     def __init__(self):
         self.x = None
         self.y = None
+        self.z = None
         self.passable = False
         self.scenery = True
         self.board = None
-        self.time_position = None
+        self.age = 0
+        self.alive = False
         pass
 
     def __str__(self):
         raise Exception
 
-    def act(self):
-        self.time_position += 1
+    def live(self):
+        self.z += 1
+        self.age += 1
         pass
 
 
@@ -35,14 +38,22 @@ class Creature(Entity):
         super(Creature, self).__init__()
         self.passable = False
         self.scenery = False
+        self.alive = True
 
     def __str__(self):
         return '@'
 
-    def act(self):
-        action_result = self.wander()
-        self.time_position += 1
-        return action_result
+    def live(self):
+        if not self.alive: # TODO возможны ли зомби? и надо ли вообще что-либо возвращать?
+            return false
+
+        if self.age <= 25:
+            action_result = self.wander()
+            self.z += 1
+            self.age +=1
+            return action_result
+        else:
+            self.die()
 
     def move(self, x, y):
         if self.board.field[y][x][-1].passable:
@@ -68,6 +79,9 @@ class Creature(Entity):
 
     def move_west(self):
         return self.move(self.x - 1, self.y)
+
+    def die(self):
+        self.alive = False
 
 
 class Blank(Entity):
