@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 import pygame
@@ -6,25 +5,27 @@ from pygame import *
 
 # <editor-fold desc="Field">
 from field import *
+
 # </editor-fold>
 
-#Объявляем переменные
-WIN_WIDTH = 800 #Ширина создаваемого окна
-WIN_HEIGHT = 640 # Высота
-DISPLAY = (WIN_WIDTH, WIN_HEIGHT) # Группируем ширину и высоту в одну переменную
+# Объявляем переменные
+WIN_WIDTH = 800  # Ширина создаваемого окна
+WIN_HEIGHT = 640  # Высота
+DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и высоту в одну переменную
 BACKGROUND_COLOR = "#004400"
 PLATFORM_WIDTH = 30
 PLATFORM_HEIGHT = 30
 PLATFORM_COLOR = "#000000"
 CREATURE_COLOR = "#550000"
 
+
 def main():
-    pygame.init() # Инициация PyGame, обязательная строчка
-    screen = pygame.display.set_mode(DISPLAY) # Создаем окошко
-    pygame.display.set_caption("Field game") # Пишем в шапку
-    bg = Surface((WIN_WIDTH,WIN_HEIGHT)) # Создание видимой поверхности
-                                         # будем использовать как фон
-    bg.fill(Color(BACKGROUND_COLOR))     # Заливаем поверхность сплошным цветом
+    pygame.init()  # Инициация PyGame, обязательная строчка
+    screen = pygame.display.set_mode(DISPLAY)  # Создаем окошко
+    pygame.display.set_caption("Field game")  # Пишем в шапку
+    bg = Surface((WIN_WIDTH, WIN_HEIGHT))  # Создание видимой поверхности
+    # будем использовать как фон
+    bg.fill(Color(BACKGROUND_COLOR))  # Заливаем поверхность сплошным цветом
 
     # <editor-fold desc="Text stats">
     # initialize font; must be called after 'pygame.init()' to avoid 'Font not Initialized' error
@@ -47,22 +48,22 @@ def main():
 
     timer = pygame.time.Clock()
 
-    while 1: # Основной цикл программы
+    while 1:  # Основной цикл программы
         timer.tick(5)
-        for e in pygame.event.get(): # Обрабатываем события
+        for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
-        # <editor-fold desc="Field">
+        # <editor-fold desc="Field">  TODO Нет первого состояния!
         f.make_time()
         level = f.list_str_representation()
         # </editor-fold>
 
         # <editor-fold desc="Text stats">
         # render text
-        label = myfont.render("Epoch: {0}".format((f.epoch)), 1, (255, 255, 0))
+        label = myfont.render("Epoch: {0}".format(f.epoch), 1, (255, 255, 0))
         screen.blit(label, (650, 10))
         # </editor-fold>
 
@@ -84,6 +85,7 @@ def main():
             x = 0  # на каждой новой строчке начинаем с нуля
 
         pygame.display.update()  # обновление и вывод всех изменений на экран
+
 
 if __name__ == "__main__":
     main()

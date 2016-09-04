@@ -50,7 +50,7 @@ class Field(object):
         else:
             self.field[y][x][-1] = entity_object
 
-        entity_object.z = self.epoch # TODO возможно, надо ставить следующую эпоху
+        entity_object.z = self.epoch  # TODO возможно, надо ставить следующую эпоху
 
         entity_object.board = self
         entity_object.x = x

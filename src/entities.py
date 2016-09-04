@@ -44,13 +44,13 @@ class Creature(Entity):
         return '@'
 
     def live(self):
-        if not self.alive: # TODO возможны ли зомби? и надо ли вообще что-либо возвращать?
-            return false
+        if not self.alive:  # TODO возможны ли зомби? и надо ли вообще что-либо возвращать?
+            return False
 
         if self.age <= 25:
             action_result = self.wander()
             self.z += 1
-            self.age +=1
+            self.age += 1
             return action_result
         else:
             self.die()
