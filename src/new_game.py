@@ -57,6 +57,7 @@ def main():
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">  TODO Нет первого состояния!
+        f.integrity_check()
         f.make_time()
         level = f.list_str_representation()
         # </editor-fold>

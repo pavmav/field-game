@@ -64,3 +64,29 @@ class Field(object):
                         element.live()
 
         self.epoch += 1
+
+    def integrity_check(self):
+        error_list = []
+        # First we check the field stucture
+        # and make full list of objects
+        objects_full_list = []
+        if len(self.field) != self.height:
+            error_str = "Field height ({0}) is not equal to the number of rows({1})".format(self.height, len(self.field))
+            error_list.append(error_str)
+        for y, row in enumerate(self.field):
+            if len(row) != self.length:
+                error_str = "Field length ({0}) is not equal to the number of cells ({1}) in row {2}".format(self.height,
+                                                                                               len(self.field), y)
+                error_list.append(error_str)
+            for x, cell in enumerate(row):
+                if len(cell) == 0:
+                    error_str = "Absolute vacuum (empy list) at coordinates x:{0} y:{1}".format(x, y)
+                    error_list.append(error_str)
+                for element in cell:
+                    objects_full_list.append(element)
+
+        # Then we check for object doubles
+
+        for line in error_list:
+            print line
+        return error_list
