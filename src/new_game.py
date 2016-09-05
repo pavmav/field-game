@@ -13,10 +13,11 @@ WIN_WIDTH = 800  # Ширина создаваемого окна
 WIN_HEIGHT = 640  # Высота
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и высоту в одну переменную
 BACKGROUND_COLOR = "#004400"
-PLATFORM_WIDTH = 30
-PLATFORM_HEIGHT = 30
+PLATFORM_WIDTH = 15
+PLATFORM_HEIGHT = 15
 PLATFORM_COLOR = "#000000"
 CREATURE_COLOR = "#550000"
+BREEDING_COLOR = "#000055"
 
 
 def main():
@@ -33,15 +34,17 @@ def main():
     # </editor-fold>
 
     # <editor-fold desc="Field">
-    f = Field(20, 15)
+    f = Field(40, 40)
 
     b = Block()
     g = Creature()
     c = Creature()
+    brg = BreedingGround()
 
     f.insert_object(5, 2, c)
-    f.insert_object(4, 2, g)
+    f.insert_object(30, 20, g)
     f.insert_object(3, 4, b)
+    f.insert_object(10, 15, brg)
 
     level = f.list_str_representation()
     # </editor-fold>
@@ -49,7 +52,7 @@ def main():
     timer = pygame.time.Clock()
 
     while 1:  # Основной цикл программы
-        timer.tick(5)
+        timer.tick(10)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
@@ -79,6 +82,10 @@ def main():
                 elif col == "@":
                     pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
                     pf.fill(Color(CREATURE_COLOR))
+                    screen.blit(pf, (x, y))
+                elif col == "*":
+                    pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+                    pf.fill(Color(BREEDING_COLOR))
                     screen.blit(pf, (x, y))
 
                 x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
