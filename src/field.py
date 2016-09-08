@@ -50,7 +50,7 @@ class Field(object):
             representation.append(row_list)
         return representation
 
-    def insert_object(self, x, y, entity_object, epoch = 0):
+    def insert_object(self, x, y, entity_object, epoch=0):
         assert x < self.length
         assert y < self.height
 
@@ -86,7 +86,7 @@ class Field(object):
         for y, row in enumerate(self.field):
             if len(row) != self.length:
                 error_str = "Field length ({0}) is not equal to the number of cells ({1}) in row {2}".format(
-                                                                                        self.height, len(self.field), y)
+                    self.height, len(self.field), y)
                 error_list.append(error_str)
             for x, cell in enumerate(row):
                 if len(cell) == 0:
@@ -94,6 +94,15 @@ class Field(object):
                     error_list.append(error_str)
                 for element in cell:
                     objects_full_list.append(element)
+                    if element.x != x or element.y != y:
+                        error_str = "Object at coordinates x:{0} y:{1} thinks it's at x:{2} y:{3}".format(x, y,
+                                                                                                          element.x,
+                                                                                                          element.y)
+                        error_list.append(error_str)
+                    if element.z != self.epoch:
+                        error_str = "Object {0} at spacial coordinates x:{1} y:{2} travels in time. Global " \
+                                    "epoch: {3}, its local time: {4}".format(str(element), x, y, self.epoch, element.z)
+                        error_list.append(error_str)
 
         # Then we check for object doubles
 
