@@ -13,6 +13,7 @@ class Entity(object):
         self.board = None
         self.age = 0
         self.alive = False
+        self.color = "#004400"
         pass
 
     def __str__(self):
@@ -32,6 +33,7 @@ class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
         self.passable = True
+        self.color = "#004400"
 
     def __str__(self):
         return '.'
@@ -41,6 +43,7 @@ class Block(Entity):
     def __init__(self):
         super(Block, self).__init__()
         self.passable = False
+        self.color = "#000000"
 
     def __str__(self):
         return '#'
@@ -53,6 +56,7 @@ class Creature(Entity):
         self.scenery = False
         self.alive = True
         self.name = ''
+        self.color = "#550000"
 
     def __str__(self):
         return '@'
@@ -106,6 +110,7 @@ class BreedingGround(Entity):
     def __init__(self):
         super(BreedingGround, self).__init__()
         self.passable = True
+        self.color = "#000055"
 
     def __str__(self):
         return "*"

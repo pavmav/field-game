@@ -41,6 +41,15 @@ class Field(object):
             representation.append(row_str)
         return representation
 
+    def list_obj_representation(self):
+        representation = []
+        for y in range(self.height):
+            row_list = []
+            for cell in self.field[y]:
+                row_list.append(cell[-1])
+            representation.append(row_list)
+        return representation
+
     def insert_object(self, x, y, entity_object, epoch = 0):
         assert x < self.length
         assert y < self.height

@@ -15,9 +15,6 @@ DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и выс
 BACKGROUND_COLOR = "#004400"
 PLATFORM_WIDTH = 15
 PLATFORM_HEIGHT = 15
-PLATFORM_COLOR = "#000000"
-CREATURE_COLOR = "#550000"
-BREEDING_COLOR = "#000055"
 
 
 def main():
@@ -47,7 +44,7 @@ def main():
     f.insert_object(3, 4, b)
     f.insert_object(10, 15, brg)
 
-    level = f.list_str_representation()
+    level = f.list_obj_representation()
     # </editor-fold>
 
     timer = pygame.time.Clock()
@@ -63,7 +60,7 @@ def main():
         # <editor-fold desc="Field">  TODO Нет первого состояния!
         f.integrity_check()
         f.make_time()
-        level = f.list_str_representation()
+        level = f.list_obj_representation()
         # </editor-fold>
 
         # <editor-fold desc="Text stats">
@@ -75,19 +72,10 @@ def main():
         x = y = 0  # координаты
 
         for row in level:  # вся строка
-            for col in row:  # каждый символ
-                if col == "#":
-                    pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-                    pf.fill(Color(PLATFORM_COLOR))
-                    screen.blit(pf, (x, y))
-                elif col == "@":
-                    pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-                    pf.fill(Color(CREATURE_COLOR))
-                    screen.blit(pf, (x, y))
-                elif col == "*":
-                    pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-                    pf.fill(Color(BREEDING_COLOR))
-                    screen.blit(pf, (x, y))
+            for element in row:  # каждый символ
+                pf = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+                pf.fill(Color(element.color))
+                screen.blit(pf, (x, y))
 
                 x += PLATFORM_WIDTH  # блоки платформы ставятся на ширине блоков
             y += PLATFORM_HEIGHT  # то же самое и с высотой
