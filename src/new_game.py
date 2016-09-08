@@ -39,6 +39,7 @@ def main():
     b = Block()
     g = Creature()
     c = Creature()
+    c.name = "John"
     brg = BreedingGround()
 
     f.insert_object(5, 2, c)

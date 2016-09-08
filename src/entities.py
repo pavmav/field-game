@@ -21,7 +21,7 @@ class Entity(object):
     def live(self):
         self.z += 1
         self.age += 1
-        pass
+
 
     def dissolve(self):
         cell = self.board.field[self.y][self.x]
@@ -52,35 +52,31 @@ class Creature(Entity):
         self.passable = False
         self.scenery = False
         self.alive = True
+        self.name = ''
 
     def __str__(self):
         return '@'
 
     def live(self):
+        super(Creature, self).live()
 
         if self.age > 50:
             self.dissolve()
-            return False
+            return
 
-        if not self.alive:  # TODO возможны ли зомби? и надо ли вообще что-либо возвращать?
-            self.z += 1
-            self.age += 1
-            return False
+        if not self.alive:
+            return
 
-        if random.random() >= 0.0005:
-            action_result = self.wander()
-            self.z += 1
-            self.age += 1
-            return action_result
-        else:
+        if random.random() <= 0.005:
             self.die()
-            self.z += 1
-            self.age += 1
+            return
+
+        self.wander()
 
     def move(self, x, y):
         if self.board.field[y][x][-1].passable:
             self.board.field[self.y][self.x].pop()
-            self.board.insert_object(x, y, self)
+            self.board.insert_object(x, y, self, epoch = 1)
             return True
         else:
             return False
@@ -120,6 +116,6 @@ class BreedingGround(Entity):
         if not self.board.field[self.y][self.x][-1].passable:
             return
 
-        if random.random() < 0.5:
+        if random.random() < 0.05:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)

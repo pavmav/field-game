@@ -41,7 +41,7 @@ class Field(object):
             representation.append(row_str)
         return representation
 
-    def insert_object(self, x, y, entity_object):
+    def insert_object(self, x, y, entity_object, epoch = 0):
         assert x < self.length
         assert y < self.height
 
@@ -50,7 +50,7 @@ class Field(object):
         else:
             self.field[y][x][-1] = entity_object
 
-        entity_object.z = self.epoch  # TODO возможно, надо ставить следующую эпоху
+        entity_object.z = self.epoch + epoch  # TODO возможно, надо ставить следующую эпоху
 
         entity_object.board = self
         entity_object.x = x
