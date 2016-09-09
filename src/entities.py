@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import actions
 
 
 class Entity(object):
@@ -76,30 +77,19 @@ class Creature(Entity):
 
         self.wander()
 
-    def move(self, x, y):
-        if self.board.field[y][x][-1].passable:
-            self.board.field[self.y][self.x].pop()
-            self.board.insert_object(x, y, self, epoch=1)
-            return True
-        else:
-            return False
-
     def wander(self):
-        possible_actions = [self.move_east, self.move_north, self.move_west, self.move_south]
-        action = random.choice(possible_actions)
-        return action()
+        move_east = actions.MovementXY(self)
+        move_east.set_xy(self.x + 1, self.y)
+        move_north = actions.MovementXY(self)
+        move_north.set_xy(self.x, self.y - 1)
+        move_west = actions.MovementXY(self)
+        move_west.set_xy(self.x - 1, self.y)
+        move_south = actions.MovementXY(self)
+        move_south.set_xy(self.x, self.y + 1)
 
-    def move_north(self):
-        return self.move(self.x, self.y - 1)
-
-    def move_south(self):
-        return self.move(self.x, self.y + 1)
-
-    def move_east(self):
-        return self.move(self.x + 1, self.y)
-
-    def move_west(self):
-        return self.move(self.x - 1, self.y)
+        possible_actions = [move_east, move_north, move_west, move_south]
+        chosen_action = random.choice(possible_actions)
+        return chosen_action.do()
 
     def die(self):
         self.alive = False
