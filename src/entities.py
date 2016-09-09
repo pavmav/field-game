@@ -6,16 +6,25 @@ import actions
 
 class Entity(object):
     def __init__(self):
+        # home universe
+        self.board = None
+
+        # time-space coordinates
         self.x = None
         self.y = None
         self.z = None
-        self.passable = False
-        self.scenery = True
-        self.board = None
+
+        # lifecycle properties
         self.age = 0
         self.alive = False
+        self.time_of_death = None
+
+        # common properties
+        self.passable = False
+        self.scenery = True
+
+        # visualization properties
         self.color = "#004400"
-        pass
 
     def __str__(self):
         raise Exception
@@ -64,14 +73,14 @@ class Creature(Entity):
     def live(self):
         super(Creature, self).live()
 
-        if self.age > 50:
+        if (self.time_of_death != None) and self.z - self.time_of_death > 10:
             self.dissolve()
             return
 
         if not self.alive:
             return
 
-        if random.random() <= 0.005:
+        if random.random() <= 0.005 and self.age > 10:
             self.die()
             return
 
@@ -93,6 +102,7 @@ class Creature(Entity):
 
     def die(self):
         self.alive = False
+        self.time_of_death = self.z
 
 
 class BreedingGround(Entity):
