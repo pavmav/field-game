@@ -19,6 +19,10 @@ class Entity(object):
         self.alive = False
         self.time_of_death = None
 
+        # action queues
+        self.action_queue = []
+        self.action_log = []
+
         # common properties
         self.passable = False
         self.scenery = True
@@ -84,21 +88,27 @@ class Creature(Entity):
             self.die()
             return
 
-        self.wander()
+        if len(self.action_queue) == 0:
+            x = random.randint(0, self.board.length)
+            y = random.randint(0, self.board.height)
+            move_random = actions.MovementXY(self)
+            move_random.set_xy(x, y)
+
+            self.action_queue.append(move_random)
+
+        self.action_queue[0].do()
+
+        if self.action_queue[0].accomplished:
+            self.action_log.append(self.action_queue.pop(0))
 
     def wander(self):
-        move_east = actions.MovementXY(self)
-        move_east.set_xy(self.x + 1, self.y)
-        move_north = actions.MovementXY(self)
-        move_north.set_xy(self.x, self.y - 1)
-        move_west = actions.MovementXY(self)
-        move_west.set_xy(self.x - 1, self.y)
-        move_south = actions.MovementXY(self)
-        move_south.set_xy(self.x, self.y + 1)
+        x = random.randint(0, self.board.length)
+        y = random.randint(0, self.board.height)
+        move_random = actions.MovementXY(self)
+        move_random.set_xy(x, y)
 
-        possible_actions = [move_east, move_north, move_west, move_south]
-        chosen_action = random.choice(possible_actions)
-        return chosen_action.do()
+        return move_random.do()
+
 
     def die(self):
         self.alive = False

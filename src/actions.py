@@ -20,10 +20,24 @@ class MovementXY(Action):
         self.target_y = y
 
     def do(self):
-        # super(MovementXY, self).do()
-        if self.subject.board.field[self.target_y][self.target_x][-1].passable:
+        self.check_set_accomplishment()
+        if self.accomplished:
+            return True
+
+        # TODO rethink movement
+        y_direction = self.target_y - self.subject.y
+        x_direction = self.target_x - self.subject.x
+
+        if abs(x_direction) > abs(y_direction):
+            current_step_x = self.subject.x + (x_direction / abs(x_direction))
+            current_step_y = self.subject.y
+        else:
+            current_step_x = self.subject.x
+            current_step_y = self.subject.y + (y_direction / abs(y_direction))
+
+        if self.subject.board.field[current_step_y][current_step_x][-1].passable:
             self.subject.board.field[self.subject.y][self.subject.x].pop()
-            self.subject.board.insert_object(self.target_x, self.target_y, self.subject, epoch=1)
+            self.subject.board.insert_object(current_step_x, current_step_y, self.subject, epoch=1)
 
         self.check_set_accomplishment()
 
