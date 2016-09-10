@@ -8,7 +8,7 @@ def draw_a(e):
 
 
 def addr(ii, jj):
-    if (ii < 0 or jj < 0 or ii >= field_height or jj >= field_width):
+    if ii < 0 or jj < 0 or ii >= field_height or jj >= field_width:
         return len(cell_matrix) - 1
     else:
         return ii * (win_width / cell_size) + jj
@@ -21,14 +21,14 @@ def refresh():
             for i_shift in xrange(-1, 2):
                 for j_shift in xrange(-1, 2):
                     if (canvas.gettags(cell_matrix[addr(i + i_shift, j + j_shift)])[0] == 'vis' and (
-                            i_shift != 0 or j_shift != 0)):
+                                    i_shift != 0 or j_shift != 0)):
                         k += 1
             current_tag = canvas.gettags(cell_matrix[addr(i, j)])[0]
-            if (k == 3):
+            if k == 3:
                 canvas.itemconfig(cell_matrix[addr(i, j)], tags=(current_tag, 'to_vis'))
-            if (k <= 1 or k >= 4):
+            if k <= 1 or k >= 4:
                 canvas.itemconfig(cell_matrix[addr(i, j)], tags=(current_tag, 'to_hid'))
-            if (k == 2 and canvas.gettags(cell_matrix[addr(i, j)])[0] == 'vis'):
+            if k == 2 and canvas.gettags(cell_matrix[addr(i, j)])[0] == 'vis':
                 canvas.itemconfig(cell_matrix[addr(i, j)], tags=(current_tag, 'to_vis'))
 
 
@@ -46,9 +46,9 @@ def clear():
 def repaint():
     for i in xrange(field_height):
         for j in xrange(field_width):
-            if (canvas.gettags(cell_matrix[addr(i, j)])[1] == 'to_hid'):
+            if canvas.gettags(cell_matrix[addr(i, j)])[1] == 'to_hid':
                 canvas.itemconfig(cell_matrix[addr(i, j)], state=HIDDEN, tags=('hid', '0'))
-            if (canvas.gettags(cell_matrix[addr(i, j)])[1] == 'to_vis'):
+            if canvas.gettags(cell_matrix[addr(i, j)])[1] == 'to_vis':
                 canvas.itemconfig(cell_matrix[addr(i, j)], state=NORMAL, tags=('vis', '0'))
 
 

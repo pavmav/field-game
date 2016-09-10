@@ -9,6 +9,7 @@ class Action(object):
     def do(self):
         pass
 
+
 class MovementXY(Action):
     def __init__(self, subject):
         super(MovementXY, self).__init__(subject)
@@ -60,7 +61,7 @@ class MovementXY(Action):
         if self.accomplished:
             return True
 
-        if self.straight == None\
+        if self.straight is None \
                 or (self.subject.x == self.target_x or self.subject.y == self.target_y):
             self.initialize_equation()
 

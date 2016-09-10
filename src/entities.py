@@ -77,7 +77,7 @@ class Creature(Entity):
     def live(self):
         super(Creature, self).live()
 
-        if (self.time_of_death != None) and self.z - self.time_of_death > 10:
+        if (self.time_of_death is not None) and self.z - self.time_of_death > 10:
             self.dissolve()
             return
 
