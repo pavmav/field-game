@@ -89,8 +89,8 @@ class Creature(Entity):
             return
 
         if len(self.action_queue) == 0:
-            x = random.randint(0, self.board.length)
-            y = random.randint(0, self.board.height)
+            x = random.randint(1, self.board.length-2)
+            y = random.randint(1, self.board.height-2)
             move_random = actions.MovementXY(self)
             move_random.set_xy(x, y)
 
@@ -107,8 +107,7 @@ class Creature(Entity):
         move_random = actions.MovementXY(self)
         move_random.set_xy(x, y)
 
-        return move_random.do()
-
+        return move_random.do
 
     def die(self):
         self.alive = False
