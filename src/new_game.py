@@ -2,6 +2,7 @@
 
 import pygame
 from pygame import *
+import pickle
 
 # <editor-fold desc="Field">
 from field import *
@@ -45,6 +46,10 @@ def main():
     f.insert_object(10, 15, brg)
 
     level = f.list_obj_representation()
+
+    # with open('field.pickle', 'rb') as fil:
+    #     f = pickle.load(fil)
+
     # </editor-fold>
 
     timer = pygame.time.Clock()
@@ -60,6 +65,7 @@ def main():
         # <editor-fold desc="Field">  TODO Нет первого состояния!
         f.integrity_check()
         f.make_time()
+        # f.save_pickle("field.pickle")
         level = f.list_obj_representation()
         # </editor-fold>
 

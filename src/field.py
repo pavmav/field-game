@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from entities import *
+import pickle
 
 
 class Field(object):
@@ -109,3 +110,7 @@ class Field(object):
         for line in error_list:
             print line
         return error_list
+
+    def save_pickle(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
