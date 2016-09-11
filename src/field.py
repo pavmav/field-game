@@ -114,3 +114,9 @@ class Field(object):
     def save_pickle(self, filename):
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
+
+
+def load_from_pickle(filename):
+    with open(filename, 'rb') as f:
+        field = pickle.load(f)
+    return field

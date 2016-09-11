@@ -2,10 +2,10 @@
 
 import pygame
 from pygame import *
-import pickle
 
 # <editor-fold desc="Field">
 from field import *
+import field
 
 # </editor-fold>
 
@@ -47,8 +47,7 @@ def main():
 
     level = f.list_obj_representation()
 
-    # with open('field.pickle', 'rb') as fil:
-    #     f = pickle.load(fil)
+    # f = field.load_from_pickle("field.pickle")
 
     # </editor-fold>
 
