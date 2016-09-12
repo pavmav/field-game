@@ -5,7 +5,7 @@ from pygame import *
 
 # <editor-fold desc="Field">
 from field import *
-import field
+# import field
 
 # </editor-fold>
 

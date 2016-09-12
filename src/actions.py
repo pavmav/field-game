@@ -38,21 +38,21 @@ class MovementXY(Action):
                 x, y = coordinates
                 wave_num = field_map[y][x] + 1
 
-                if (len(field_map)-1 >= y+1) and field_map[y+1][x] is None:
-                    field_map[y+1][x] = wave_num
-                    next_wave_list.append((x, y+1))
+                if (len(field_map) - 1 >= y + 1) and field_map[y + 1][x] is None:
+                    field_map[y + 1][x] = wave_num
+                    next_wave_list.append((x, y + 1))
 
-                if (y > 0) and field_map[y-1][x] is None:
-                    field_map[y-1][x] = wave_num
-                    next_wave_list.append((x, y-1))
+                if (y > 0) and field_map[y - 1][x] is None:
+                    field_map[y - 1][x] = wave_num
+                    next_wave_list.append((x, y - 1))
 
-                if (len(field_map[y])-1 >= x+1) and field_map[y][x+1] is None:
-                    field_map[y][x+1] = wave_num
-                    next_wave_list.append((x+1, y))
+                if (len(field_map[y]) - 1 >= x + 1) and field_map[y][x + 1] is None:
+                    field_map[y][x + 1] = wave_num
+                    next_wave_list.append((x + 1, y))
 
-                if (x > 0) and field_map[y][x-1] is None:
-                    field_map[y][x-1] = wave_num
-                    next_wave_list.append((x-1, y))
+                if (x > 0) and field_map[y][x - 1] is None:
+                    field_map[y][x - 1] = wave_num
+                    next_wave_list.append((x - 1, y))
 
             current_wave_list = next_wave_list[:]
 
@@ -106,7 +106,6 @@ class MovementXY(Action):
                 return False
 
         return True
-
 
     def set_xy(self, x, y):
         self.target_x = x

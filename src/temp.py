@@ -1,4 +1,3 @@
-
 def wave(field, x1, y1, x2, y2):
     current_wave_list = [(x1, y1)]
     field[y1][x1] = 0
@@ -9,23 +8,24 @@ def wave(field, x1, y1, x2, y2):
             x, y = coordinates
             wave_num = field[y][x] + 1
 
-            if (len(field)-1 >= y+1) and field[y+1][x] is None:
-                field[y+1][x] = wave_num
-                next_wave_list.append((x, y+1))
+            if (len(field) - 1 >= y + 1) and field[y + 1][x] is None:
+                field[y + 1][x] = wave_num
+                next_wave_list.append((x, y + 1))
 
-            if (y > 0) and field[y-1][x] is None:
-                field[y-1][x] = wave_num
-                next_wave_list.append((x, y-1))
+            if (y > 0) and field[y - 1][x] is None:
+                field[y - 1][x] = wave_num
+                next_wave_list.append((x, y - 1))
 
-            if (len(field[y])-1 >= x+1) and field[y][x+1] is None:
-                field[y][x+1] = wave_num
-                next_wave_list.append((x+1, y))
+            if (len(field[y]) - 1 >= x + 1) and field[y][x + 1] is None:
+                field[y][x + 1] = wave_num
+                next_wave_list.append((x + 1, y))
 
-            if (x > 0) and field[y][x-1] is None:
-                field[y][x-1] = wave_num
-                next_wave_list.append((x-1, y))
+            if (x > 0) and field[y][x - 1] is None:
+                field[y][x - 1] = wave_num
+                next_wave_list.append((x - 1, y))
 
         current_wave_list = next_wave_list[:]
+
 
 def find_backwards(field, x2, y2):
     num_steps = field[y2][x2]
@@ -42,11 +42,11 @@ def find_backwards(field, x2, y2):
 
         if (len(field) - 1 >= y + 1) and (field[y + 1][x] == num_steps):
             path.append((x, y + 1))
-        elif (y > 0) and (field[y-1][x] == num_steps):
+        elif (y > 0) and (field[y - 1][x] == num_steps):
             path.append((x, y - 1))
-        elif (len(field[y])-1 >= x+1) and (field[y][x+1] == num_steps):
+        elif (len(field[y]) - 1 >= x + 1) and (field[y][x + 1] == num_steps):
             path.append((x + 1, y))
-        elif (x > 0) and (field[y][x-1] == num_steps):
+        elif (x > 0) and (field[y][x - 1] == num_steps):
             path.append((x - 1, y))
 
         num_steps -= 1
@@ -55,8 +55,8 @@ def find_backwards(field, x2, y2):
 
     return path
 
-def find_way(field, x1, y1, x2, y2):
 
+def find_way(field, x1, y1, x2, y2):
     if field[y2][x2] == -1:
         return None
 

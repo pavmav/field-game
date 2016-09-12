@@ -91,6 +91,10 @@ class Creature(Entity):
         if len(self.action_queue) == 0:
             x = random.randint(1, self.board.length-2)
             y = random.randint(1, self.board.height-2)
+
+            if not self.board.field[y][x][-1].passable:
+                return
+
             move_random = actions.MovementXY(self)
             move_random.set_xy(x, y)
 
@@ -100,14 +104,6 @@ class Creature(Entity):
 
         if self.action_queue[0].accomplished:
             self.action_log.append(self.action_queue.pop(0))
-
-    def wander(self):
-        x = random.randint(0, self.board.length)
-        y = random.randint(0, self.board.height)
-        move_random = actions.MovementXY(self)
-        move_random.set_xy(x, y)
-
-        return move_random.do
 
     def die(self):
         self.alive = False
@@ -129,6 +125,6 @@ class BreedingGround(Entity):
         if not self.board.field[self.y][self.x][-1].passable:
             return
 
-        if random.random() < 0.1:
+        if random.random() < 0.5:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)
