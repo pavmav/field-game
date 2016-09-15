@@ -4,7 +4,8 @@ class Action(object):
     def __init__(self, subject):
         self.subject = subject
         self.accomplished = False
-        pass
+        self.time_start = subject.board.epoch
+        self.time_finish = None
 
     def do(self):
         pass
@@ -88,7 +89,7 @@ class MovementXY(Action):
     def __make_map(self):
         field_map = []
 
-        for input_row in self.subject.board.field:
+        for input_row in self.subject.board.get_field():
             row = []
             for cell in input_row:
                 if cell[-1].passable:
@@ -102,7 +103,7 @@ class MovementXY(Action):
     def check_path_passable(self):
 
         for step_coordinates in self.path:
-            if not self.subject.board.field[step_coordinates[1]][step_coordinates[0]][-1].passable:
+            if not self.subject.board.cell_passable(step_coordinates[0], step_coordinates[1]):
                 return False
 
         return True
@@ -124,8 +125,8 @@ class MovementXY(Action):
 
         current_step_x, current_step_y = self.path[0]
 
-        if self.subject.board.field[current_step_y][current_step_x][-1].passable:
-            self.subject.board.field[self.subject.y][self.subject.x].pop()
+        if self.subject.board.cell_passable(current_step_x, current_step_y):
+            self.subject.board.remove_object(self.subject, self.subject.x, self.subject.y)
             self.subject.board.insert_object(current_step_x, current_step_y, self.subject, epoch=1)
             self.path.pop(0)
 

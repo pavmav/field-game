@@ -38,9 +38,7 @@ class Entity(object):
         self.age += 1
 
     def dissolve(self):
-        cell = self.board.field[self.y][self.x]
-        cell.remove(self)
-
+        self.board.remove_object(self)
 
 class Blank(Entity):
     def __init__(self):
@@ -92,7 +90,7 @@ class Creature(Entity):
             x = random.randint(1, self.board.length-2)
             y = random.randint(1, self.board.height-2)
 
-            if not self.board.field[y][x][-1].passable:
+            if not self.board.cell_passable(x, y):
                 return
 
             move_random = actions.MovementXY(self)
@@ -122,9 +120,9 @@ class BreedingGround(Entity):
     def live(self):
         super(BreedingGround, self).live()
 
-        if not self.board.field[self.y][self.x][-1].passable:
+        if not self.board.cell_passable(self.x, self.y):
             return
 
-        if random.random() < 0.5:
+        if random.random() < 1.5:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)

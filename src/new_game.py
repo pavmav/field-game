@@ -5,7 +5,7 @@ from pygame import *
 
 # <editor-fold desc="Field">
 from field import *
-# import field
+# import __field
 
 # </editor-fold>
 
@@ -14,8 +14,8 @@ WIN_WIDTH = 800  # Ширина создаваемого окна
 WIN_HEIGHT = 640  # Высота
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и высоту в одну переменную
 BACKGROUND_COLOR = "#004400"
-PLATFORM_WIDTH = 15
-PLATFORM_HEIGHT = 15
+PLATFORM_WIDTH = 10
+PLATFORM_HEIGHT = 10
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
     # </editor-fold>
 
     # <editor-fold desc="Field">
-    f = Field(40, 40)
+    f = Field(60, 40)
 
     b = Block()
     g = Creature()
@@ -47,7 +47,7 @@ def main():
 
     level = f.list_obj_representation()
 
-    # f = field.load_from_pickle("field.pickle")
+    # f = __field.load_from_pickle("__field.pickle")
 
     # </editor-fold>
 
@@ -64,7 +64,7 @@ def main():
         # <editor-fold desc="Field">  TODO Нет первого состояния!
         f.integrity_check()
         f.make_time()
-        # f.save_pickle("field.pickle")
+        # f.save_pickle("__field.pickle")
         level = f.list_obj_representation()
         # </editor-fold>
 
