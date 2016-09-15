@@ -131,6 +131,21 @@ class Field(object):
             print line
         return error_list
 
+    def get_stats(self):
+        stats = {}
+
+        for row in self.__field:
+            for cell in row:
+                for element in cell:
+                    class_name = element.class_name()
+
+                    if not class_name in stats:
+                        stats[class_name] = 1
+                    else:
+                        stats[class_name] += 1
+
+        return stats
+
     def save_pickle(self, filename):
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
@@ -140,3 +155,7 @@ def load_from_pickle(filename):
     with open(filename, 'rb') as f:
         field = pickle.load(f)
     return field
+
+
+f = Field(10, 10)
+print f.get_stats()

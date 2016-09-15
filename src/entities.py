@@ -40,6 +40,11 @@ class Entity(object):
     def dissolve(self):
         self.board.remove_object(self)
 
+    @classmethod
+    def class_name(cls):
+        return "Entity"
+
+
 class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
@@ -48,6 +53,10 @@ class Blank(Entity):
 
     def __str__(self):
         return '.'
+
+    @classmethod
+    def class_name(cls):
+        return "Blank"
 
 
 class Block(Entity):
@@ -58,6 +67,10 @@ class Block(Entity):
 
     def __str__(self):
         return '#'
+
+    @classmethod
+    def class_name(cls):
+        return "Block"
 
 
 class Creature(Entity):
@@ -87,8 +100,8 @@ class Creature(Entity):
             return
 
         if len(self.action_queue) == 0:
-            x = random.randint(1, self.board.length-2)
-            y = random.randint(1, self.board.height-2)
+            x = random.randint(1, self.board.length - 2)
+            y = random.randint(1, self.board.height - 2)
 
             if not self.board.cell_passable(x, y):
                 return
@@ -106,6 +119,10 @@ class Creature(Entity):
     def die(self):
         self.alive = False
         self.time_of_death = self.z
+
+    @classmethod
+    def class_name(cls):
+        return "Creature"
 
 
 class BreedingGround(Entity):
@@ -126,3 +143,7 @@ class BreedingGround(Entity):
         if random.random() < 1.5:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)
+
+    @classmethod
+    def class_name(cls):
+        return "Breeding ground"

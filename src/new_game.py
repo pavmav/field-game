@@ -54,7 +54,7 @@ def main():
     timer = pygame.time.Clock()
 
     while 1:  # Основной цикл программы
-        timer.tick(10)
+        timer.tick(1000)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
@@ -71,7 +71,13 @@ def main():
         # <editor-fold desc="Text stats">
         # render text
         label = myfont.render("Epoch: {0}".format(f.epoch), 1, (255, 255, 0))
-        screen.blit(label, (650, 10))
+        screen.blit(label, (630, 10))
+
+        stats = f.get_stats()
+        for i, element in enumerate(stats):
+            label = myfont.render("{0}: {1}".format(element, stats[element]), 1, (255, 255, 0))
+            screen.blit(label, (630, 25 + (i*15)))
+
         # </editor-fold>
 
         x = y = 0  # координаты
