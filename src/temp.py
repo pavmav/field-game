@@ -64,11 +64,14 @@ def find_way(field, x1, y1, x2, y2):
     return find_backwards(field, x2, y2)
 
 
-field = [[None, None, None, None, None],
-         [-1, -1, -1, -1, None],
-         [None, None, None, None, None],
-         [None, -1, -1, -1, -1],
-         [None, None, 0, None, None],
-         [None, None, None, None, None]]
+# field = [[None, None, None, None, None],
+#          [-1, -1, -1, -1, None],
+#          [None, None, None, None, None],
+#          [None, -1, -1, -1, -1],
+#          [None, None, 0, None, None],
+#          [None, None, None, None, None]]
+#
+# print find_way(field, 2, 4, 3, 0)
 
-print find_way(field, 2, 4, 3, 0)
+for i in range(2,5):
+    print i

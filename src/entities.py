@@ -2,6 +2,7 @@
 
 import random
 import actions
+import substances
 
 
 class Entity(object):
@@ -26,12 +27,19 @@ class Entity(object):
         # common properties
         self.passable = False
         self.scenery = True
+        self._container = []
 
         # visualization properties
         self.color = "#004400"
 
     def __str__(self):
         raise Exception
+
+    def contains(self, substance_type):
+        for element in self._container:
+            if type(element) == substance_type:
+                return True
+        return False
 
     def live(self):
         self.z += 1
@@ -57,6 +65,15 @@ class Blank(Entity):
     @classmethod
     def class_name(cls):
         return "Blank"
+
+    def live(self):
+        super(Blank, self).live()
+
+        if random.random() <= 0.000005:
+            self._container.append(substances.Substance())
+
+        if len(self._container) > 0:
+            self.color = "#224444"
 
 
 class Block(Entity):
@@ -95,13 +112,19 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        if random.random() <= 0.005 and self.age > 10:
-            self.die()
-            return
+        # if random.random() <= 0.005 and self.age > 10:
+        #     self.die()
+        #     return
 
         if len(self.action_queue) == 0:
-            x = random.randint(1, self.board.length - 2)
-            y = random.randint(1, self.board.height - 2)
+            find_substance = actions.SearchSubstance(self)
+            find_substance.set_target(type(substances.Substance()))
+            find_substance.do()
+            if find_substance.accomplished:
+                x, y = find_substance.get_result()
+            else:
+                x = random.randint(1, self.board.length - 2)
+                y = random.randint(1, self.board.height - 2)
 
             if not self.board.cell_passable(x, y):
                 return
@@ -115,6 +138,7 @@ class Creature(Entity):
 
         if self.action_queue[0].accomplished:
             self.action_log.append(self.action_queue.pop(0))
+
 
     def die(self):
         self.alive = False

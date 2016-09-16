@@ -10,6 +10,9 @@ class Action(object):
     def do(self):
         pass
 
+    def get_result(self):
+        return self.accomplished
+
 
 class MovementXY(Action):
     def __init__(self, subject):
@@ -136,3 +139,68 @@ class MovementXY(Action):
 
     def check_set_accomplishment(self):
         self.accomplished = (self.subject.x == self.target_x and self.subject.y == self.target_y)
+
+class SearchSubstance(Action):
+    def __init__(self, subject):
+        super(SearchSubstance, self).__init__(subject)
+
+        self.__target_substance_type = None
+
+        self.__substance_x = None
+        self.__substance_y = None
+
+    def set_target(self, substance_type):
+        self.__target_substance_type = substance_type
+
+    def get_result(self):
+
+        if not self.accomplished:
+            self.do()
+
+        if self.__substance_x is None or self.__substance_y is None:
+            return self.accomplished
+
+        return self.__substance_x, self.__substance_y
+
+    def search(self):
+        continue_search = False
+        radius = 1
+
+        while continue_search or radius == 1:
+            continue_search = False
+            # print radius
+            for x in range(self.subject.x - radius, self.subject.x + radius + 1):
+                if x == self.subject.x - radius or x == self.subject.x + radius:
+                    for y in range(self.subject.y - radius, self.subject.y + radius + 1):
+                        if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
+                            cell = self.subject.board.get_cell(x, y)
+                            for element in cell:
+                                # print self.__target_substance_type
+                                if element.contains(self.__target_substance_type):
+                                    self.__substance_x = x
+                                    self.__substance_y = y
+                                    self.accomplished = True
+                                    return
+                            continue_search = True
+                else:
+                    for y in [self.subject.y - radius, self.subject.y + radius]:
+                        if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
+                            cell = self.subject.board.get_cell(x, y)
+                            for element in cell:
+                                # print self.__target_substance_type
+                                if element.contains(self.__target_substance_type):
+                                    self.__substance_x = x
+                                    self.__substance_y = y
+                                    self.accomplished = True
+                                    return
+                            continue_search = True
+
+                        # print x, y
+
+            radius += 1
+
+    def do(self):
+        super(SearchSubstance, self).do()
+        self.search()
+
+

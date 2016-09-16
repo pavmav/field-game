@@ -155,7 +155,3 @@ def load_from_pickle(filename):
     with open(filename, 'rb') as f:
         field = pickle.load(f)
     return field
-
-
-f = Field(10, 10)
-print f.get_stats()
