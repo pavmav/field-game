@@ -6,16 +6,15 @@ import pickle
 
 class Field(object):
     def __init__(self, length, height):
-        self.length = length
-        self.height = height
+        self.__length = length
+        self.__height = height
         self.__field = []
-        self.epoch = 0
-        self.population = 0
+        self.__epoch = 0
 
-        for y in range(self.height):
+        for y in range(self.__height):
             row = []
             self.__field.append(row)
-            for x in range(self.length):
+            for x in range(self.__length):
                 if y == 0 or x == 0 or y == (height - 1) or x == (length - 1):
                     init_object = Block()
                 else:
@@ -26,6 +25,18 @@ class Field(object):
                 init_object.z = 0
 
                 row.append([init_object])
+
+    @property
+    def epoch(self):
+        return self.__epoch
+
+    @property
+    def length(self):
+        return self.__length
+
+    @property
+    def height(self):
+        return self.__height
 
     def get_field(self):
         return self.__field
@@ -93,7 +104,7 @@ class Field(object):
                     if element.z == self.epoch:
                         element.live()
 
-        self.epoch += 1
+        self.__epoch += 1
 
     def integrity_check(self):
         error_list = []
