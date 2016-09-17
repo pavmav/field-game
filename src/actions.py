@@ -116,6 +116,7 @@ class MovementXY(Action):
         self.target_y = y
 
     def do(self):
+        super(MovementXY, self).do()
         self.check_set_accomplishment()
         if self.accomplished:
             return True
@@ -139,6 +140,7 @@ class MovementXY(Action):
 
     def check_set_accomplishment(self):
         self.accomplished = (self.subject.x == self.target_x and self.subject.y == self.target_y)
+
 
 class SearchSubstance(Action):
     def __init__(self, subject):
@@ -204,3 +206,30 @@ class SearchSubstance(Action):
         self.search()
 
 
+class ExtractSubstance(Action):
+    def __init__(self, subject):
+        super(ExtractSubstance, self).__init__(subject)
+
+        self.__substance_x = None
+        self.__substance_y = None
+
+        self.__substance_type = None
+
+    def set_objective(self, substance_x, substance_y, substance_type):
+        self.__substance_type = substance_type
+        self.__substance_x = substance_x
+        self.__substance_y = substance_y
+
+    def get_result(self):
+        return super(ExtractSubstance, self).get_result()
+
+    def do(self):
+        super(ExtractSubstance, self).do()
+
+        cell = self.subject.board.get_cell(self.__substance_x, self.__substance_y)
+
+        for element in cell:
+            if element.contains(self.__substance_type):
+                self.subject.pocket(element.extract(self.__substance_type))
+                self.accomplished = True
+                break

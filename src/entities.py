@@ -41,6 +41,20 @@ class Entity(object):
                 return True
         return False
 
+    def extract(self, substance_type):
+        substance_index = None
+        for i, element in enumerate(self._container):
+            if type(element) == substance_type:
+                substance_index = i
+                break
+        if substance_index == None:
+            return None
+        return self._container.pop(substance_index)
+
+    def pocket(self, substance_object):
+        if substance_object is not None:
+            self._container.append(substance_object)
+
     def live(self):
         self.z += 1
         self.age += 1
@@ -69,11 +83,13 @@ class Blank(Entity):
     def live(self):
         super(Blank, self).live()
 
-        if random.random() <= 0.000005:
+        if random.random() <= 0.00005:
             self._container.append(substances.Substance())
 
         if len(self._container) > 0:
             self.color = "#224444"
+        else:
+            self.color = "#004400"
 
 
 class Block(Entity):
@@ -133,6 +149,11 @@ class Creature(Entity):
             move_random.set_xy(x, y)
 
             self.action_queue.append(move_random)
+
+            if find_substance.accomplished:
+                extract_substance = actions.ExtractSubstance(self)
+                extract_substance.set_objective(x, y, type(substances.Substance()))
+                self.action_queue.append(extract_substance)
 
         self.action_queue[0].do()
 
