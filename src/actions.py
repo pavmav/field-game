@@ -13,6 +13,16 @@ class Action(object):
     def get_result(self):
         return self.accomplished
 
+    def set_objective(self, **kwargs):
+        for arg in kwargs.keys():
+            self.arg = kwargs[arg]
+            print kwargs[arg]
+
+# a = Action(3)
+#
+# a.set_objective(accomplished = True)
+#
+# print a.accomplished
 
 class MovementXY(Action):
     def __init__(self, subject):
