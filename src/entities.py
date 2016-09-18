@@ -134,7 +134,8 @@ class Creature(Entity):
 
         if len(self.action_queue) == 0:
             find_substance = actions.SearchSubstance(self)
-            find_substance.set_target(type(substances.Substance()))
+            # find_substance.set_target(type(substances.Substance()))
+            find_substance.set_objective(**{"target_substance_type":type(substances.Substance())})
             find_substance.do()
             if find_substance.accomplished:
                 x, y = find_substance.get_result()
@@ -146,20 +147,23 @@ class Creature(Entity):
                 return
 
             move_random = actions.MovementXY(self)
-            move_random.set_xy(x, y)
+            # move_random.set_xy(x, y)
+            move_random.set_objective(**{"target_x":x, "target_y":y})
 
             self.action_queue.append(move_random)
 
             if find_substance.accomplished:
                 extract_substance = actions.ExtractSubstance(self)
-                extract_substance.set_objective(x, y, type(substances.Substance()))
+                # extract_substance.set_objective(x, y, type(substances.Substance()))
+                extract_substance.set_objective(**{"substance_x":x,
+                                                   "substance_y":y,
+                                                   "substance_type":type(substances.Substance())})
                 self.action_queue.append(extract_substance)
 
         self.action_queue[0].do()
 
         if self.action_queue[0].accomplished:
             self.action_log.append(self.action_queue.pop(0))
-
 
     def die(self):
         self.alive = False

@@ -73,5 +73,24 @@ def find_way(field, x1, y1, x2, y2):
 #
 # print find_way(field, 2, 4, 3, 0)
 
-for i in range(2,5):
-    print i
+# for i in range(2,5):
+#     print i
+
+class Foo(object):
+
+    def __init__(self):
+        self.__bar = 7
+    pass
+
+    def spam(self):
+        # setattr(a, "__bar", 3)
+        self.__setattr__("__bar", 3)
+
+    def eggs(self):
+        print self.__bar
+
+a = Foo()
+
+a.spam()
+
+a.eggs()

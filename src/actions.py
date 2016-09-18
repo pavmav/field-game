@@ -13,10 +13,19 @@ class Action(object):
     def get_result(self):
         return self.accomplished
 
+    def get_objective(self):
+        return {}
+
     def set_objective(self, **kwargs):
-        for arg in kwargs.keys():
-            self.arg = kwargs[arg]
-            print kwargs[arg]
+        valid_objectives = self.get_objective().keys()
+
+        for key in kwargs.keys():
+            if not key in valid_objectives:
+                raise ValueError("{0} is not a valid objective".format(key))
+            setattr(self, "_{0}".format(key), kwargs[key])
+
+    def action_possible(self):
+        return True
 
 # a = Action(3)
 #
@@ -27,19 +36,20 @@ class Action(object):
 class MovementXY(Action):
     def __init__(self, subject):
         super(MovementXY, self).__init__(subject)
-        self.target_x = None
-        self.target_y = None
+
+        self._target_x = None
+        self._target_y = None
 
         self.path = []
 
     def initialize_path(self):
         field_map = self.__make_map()
-        self.__wave(field_map, self.subject.x, self.subject.y, self.target_x, self.target_y)
+        self.__wave(field_map, self.subject.x, self.subject.y, self._target_x, self._target_y)
 
-        if field_map[self.target_y][self.target_x] == -1:
+        if field_map[self._target_y][self._target_x] == -1:
             self.path = []
 
-        self.path = self.__find_backwards(field_map, self.target_x, self.target_y)
+        self.path = self.__find_backwards(field_map, self._target_x, self._target_y)
 
     @staticmethod
     def __wave(field_map, x1, y1, x2, y2):
@@ -122,8 +132,16 @@ class MovementXY(Action):
         return True
 
     def set_xy(self, x, y):
-        self.target_x = x
-        self.target_y = y
+        self._target_x = x
+        self._target_y = y
+
+    def get_objective(self):
+        out = {}
+
+        out["target_x"] = self._target_x
+        out["target_y"] = self._target_y
+
+        return out
 
     def do(self):
         super(MovementXY, self).do()
@@ -149,30 +167,37 @@ class MovementXY(Action):
         return self.accomplished
 
     def check_set_accomplishment(self):
-        self.accomplished = (self.subject.x == self.target_x and self.subject.y == self.target_y)
+        self.accomplished = (self.subject.x == self._target_x and self.subject.y == self._target_y)
 
 
 class SearchSubstance(Action):
     def __init__(self, subject):
         super(SearchSubstance, self).__init__(subject)
 
-        self.__target_substance_type = None
+        self._target_substance_type = None
 
-        self.__substance_x = None
-        self.__substance_y = None
+        self._substance_x = None
+        self._substance_y = None
 
     def set_target(self, substance_type):
-        self.__target_substance_type = substance_type
+        self._target_substance_type = substance_type
+
+    def get_objective(self):
+        out = {}
+
+        out["target_substance_type"] = self._target_substance_type
+
+        return out
 
     def get_result(self):
 
         if not self.accomplished:
             self.do()
 
-        if self.__substance_x is None or self.__substance_y is None:
+        if self._substance_x is None or self._substance_y is None:
             return self.accomplished
 
-        return self.__substance_x, self.__substance_y
+        return self._substance_x, self._substance_y
 
     def search(self):
         continue_search = False
@@ -187,10 +212,10 @@ class SearchSubstance(Action):
                         if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
-                                # print self.__target_substance_type
-                                if element.contains(self.__target_substance_type):
-                                    self.__substance_x = x
-                                    self.__substance_y = y
+                                # print self._target_substance_type
+                                if element.contains(self._target_substance_type):
+                                    self._substance_x = x
+                                    self._substance_y = y
                                     self.accomplished = True
                                     return
                             continue_search = True
@@ -199,10 +224,10 @@ class SearchSubstance(Action):
                         if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
-                                # print self.__target_substance_type
-                                if element.contains(self.__target_substance_type):
-                                    self.__substance_x = x
-                                    self.__substance_y = y
+                                # print self._target_substance_type
+                                if element.contains(self._target_substance_type):
+                                    self._substance_x = x
+                                    self._substance_y = y
                                     self.accomplished = True
                                     return
                             continue_search = True
@@ -220,15 +245,19 @@ class ExtractSubstance(Action):
     def __init__(self, subject):
         super(ExtractSubstance, self).__init__(subject)
 
-        self.__substance_x = None
-        self.__substance_y = None
+        self._substance_x = None
+        self._substance_y = None
 
-        self.__substance_type = None
+        self._substance_type = None
 
-    def set_objective(self, substance_x, substance_y, substance_type):
-        self.__substance_type = substance_type
-        self.__substance_x = substance_x
-        self.__substance_y = substance_y
+    def get_objective(self):
+        out = {}
+
+        out["substance_type"] = self._substance_type
+        out["substance_x"] = self._substance_x
+        out["substance_y"] = self._substance_y
+
+        return out
 
     def get_result(self):
         return super(ExtractSubstance, self).get_result()
@@ -236,10 +265,10 @@ class ExtractSubstance(Action):
     def do(self):
         super(ExtractSubstance, self).do()
 
-        cell = self.subject.board.get_cell(self.__substance_x, self.__substance_y)
+        cell = self.subject.board.get_cell(self._substance_x, self._substance_y)
 
         for element in cell:
-            if element.contains(self.__substance_type):
-                self.subject.pocket(element.extract(self.__substance_type))
+            if element.contains(self._substance_type):
+                self.subject.pocket(element.extract(self._substance_type))
                 self.accomplished = True
                 break
