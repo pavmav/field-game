@@ -4,8 +4,9 @@ class Action(object):
     def __init__(self, subject):
         self.subject = subject
         self.accomplished = False
-        self.time_start = subject.board.epoch
-        self.time_finish = None
+        # self.finished = False
+        # self.time_start = subject.board.epoch
+        # self.time_finish = None
 
     def do(self):
         pass
@@ -27,11 +28,6 @@ class Action(object):
     def action_possible(self):
         return True
 
-# a = Action(3)
-#
-# a.set_objective(accomplished = True)
-#
-# print a.accomplished
 
 class MovementXY(Action):
     def __init__(self, subject):
@@ -41,6 +37,19 @@ class MovementXY(Action):
         self._target_y = None
 
         self.path = []
+
+    def action_possible(self):
+
+        if self._target_x is None or self._target_y is None:
+            return False
+
+        if self.path is None or len(self.path) == 0:
+            self.initialize_path()
+
+        if self.path is None or len(self.path) == 0:
+            return False
+
+        return True
 
     def initialize_path(self):
         field_map = self.__make_map()
@@ -179,6 +188,12 @@ class SearchSubstance(Action):
         self._substance_x = None
         self._substance_y = None
 
+    def action_possible(self):
+        if self._target_substance_type is None:
+            return False
+
+        return True
+
     def set_target(self, substance_type):
         self._target_substance_type = substance_type
 
@@ -190,6 +205,9 @@ class SearchSubstance(Action):
         return out
 
     def get_result(self):
+
+        if not self.action_possible():
+            return self.accomplished
 
         if not self.accomplished:
             self.do()
@@ -213,7 +231,7 @@ class SearchSubstance(Action):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
                                 # print self._target_substance_type
-                                if element.contains(self._target_substance_type):
+                                if element.contains(self._target_substance_type) and not element.alive:
                                     self._substance_x = x
                                     self._substance_y = y
                                     self.accomplished = True
@@ -225,7 +243,7 @@ class SearchSubstance(Action):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
                                 # print self._target_substance_type
-                                if element.contains(self._target_substance_type):
+                                if element.contains(self._target_substance_type) and not element.alive:
                                     self._substance_x = x
                                     self._substance_y = y
                                     self.accomplished = True
@@ -241,14 +259,36 @@ class SearchSubstance(Action):
         self.search()
 
 
-class ExtractSubstance(Action):
+class ExtractSubstanceXY(Action):
     def __init__(self, subject):
-        super(ExtractSubstance, self).__init__(subject)
+        super(ExtractSubstanceXY, self).__init__(subject)
 
         self._substance_x = None
         self._substance_y = None
 
         self._substance_type = None
+
+    def action_possible(self):
+        if self._substance_x is None or self._substance_y is None or self._substance_type is None:
+            return False
+
+        cell_contains_substance = False
+        cell = self.subject.board.get_cell(self._substance_x, self._substance_y)
+        for element in cell:
+            if element.contains(self._substance_type):
+                cell_contains_substance = True
+                break
+
+        if not cell_contains_substance:
+            return False
+
+        x_distance = abs(self._substance_x - self.subject.x)
+        y_distance = abs(self._substance_y - self.subject.y)
+
+        if x_distance + y_distance > 1:
+            return False
+
+        return True
 
     def get_objective(self):
         out = {}
@@ -260,10 +300,10 @@ class ExtractSubstance(Action):
         return out
 
     def get_result(self):
-        return super(ExtractSubstance, self).get_result()
+        return super(ExtractSubstanceXY, self).get_result()
 
     def do(self):
-        super(ExtractSubstance, self).do()
+        super(ExtractSubstanceXY, self).do()
 
         cell = self.subject.board.get_cell(self._substance_x, self._substance_y)
 

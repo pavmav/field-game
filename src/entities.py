@@ -83,7 +83,7 @@ class Blank(Entity):
     def live(self):
         super(Blank, self).live()
 
-        if random.random() <= 0.00005:
+        if random.random() <= 0.0005:
             self._container.append(substances.Substance())
 
         if len(self._container) > 0:
@@ -128,42 +128,46 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        # if random.random() <= 0.005 and self.age > 10:
-        #     self.die()
-        #     return
+        if random.random() <= 0.005 and self.age > 10:
+            self.die()
+            return
 
         if len(self.action_queue) == 0:
-            find_substance = actions.SearchSubstance(self)
-            # find_substance.set_target(type(substances.Substance()))
-            find_substance.set_objective(**{"target_substance_type":type(substances.Substance())})
-            find_substance.do()
-            if find_substance.accomplished:
-                x, y = find_substance.get_result()
+            self.plan()
+
+        if len(self.action_queue) > 0:
+            if self.action_queue[0].action_possible():
+                self.action_queue[0].do()
+
+                if self.action_queue[0].accomplished:
+                    self.action_log.append(self.action_queue.pop(0))
+
             else:
-                x = random.randint(1, self.board.length - 2)
-                y = random.randint(1, self.board.height - 2)
 
-            if not self.board.cell_passable(x, y):
-                return
+                self.action_log.append(self.action_queue.pop(0))
 
-            move_random = actions.MovementXY(self)
-            # move_random.set_xy(x, y)
-            move_random.set_objective(**{"target_x":x, "target_y":y})
+    def plan(self):
+        find_substance = actions.SearchSubstance(self)
+        find_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+        search_results = find_substance.get_result()
+        if search_results:
+            x, y = search_results
+        else:
+            x = random.randint(1, self.board.length - 2)
+            y = random.randint(1, self.board.height - 2)
 
-            self.action_queue.append(move_random)
+        move = actions.MovementXY(self)
+        move.set_objective(**{"target_x": x, "target_y": y})
 
-            if find_substance.accomplished:
-                extract_substance = actions.ExtractSubstance(self)
-                # extract_substance.set_objective(x, y, type(substances.Substance()))
-                extract_substance.set_objective(**{"substance_x":x,
-                                                   "substance_y":y,
-                                                   "substance_type":type(substances.Substance())})
-                self.action_queue.append(extract_substance)
+        self.action_queue.append(move)
 
-        self.action_queue[0].do()
-
-        if self.action_queue[0].accomplished:
-            self.action_log.append(self.action_queue.pop(0))
+        if search_results:
+            extract_substance = actions.ExtractSubstanceXY(self)
+            # extract_substance.set_objective(x, y, type(substances.Substance()))
+            extract_substance.set_objective(**{"substance_x": x,
+                                               "substance_y": y,
+                                               "substance_type": type(substances.Substance())})
+            self.action_queue.append(extract_substance)
 
     def die(self):
         self.alive = False
@@ -189,7 +193,7 @@ class BreedingGround(Entity):
         if not self.board.cell_passable(self.x, self.y):
             return
 
-        if random.random() < 1.5:
+        if random.random() < 0.05:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)
 

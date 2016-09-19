@@ -43,7 +43,7 @@ def main():
     f.insert_object(5, 2, c)
     f.insert_object(30, 20, g)
     f.insert_object(3, 4, b)
-    # f.insert_object(10, 15, brg)
+    f.insert_object(10, 15, brg)
 
     level = f.list_obj_representation()
 
