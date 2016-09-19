@@ -4,15 +4,16 @@ class Action(object):
     def __init__(self, subject):
         self.subject = subject
         self.accomplished = False
-        # self.finished = False
+        self._done = False
         # self.time_start = subject.board.epoch
         # self.time_finish = None
 
     def do(self):
-        pass
+        self._done = True
 
     def get_result(self):
-        return self.accomplished
+        out = {"done": self._done, "accomplished": self.accomplished}
+        return out
 
     def get_objective(self):
         return {}
@@ -139,10 +140,6 @@ class MovementXY(Action):
                 return False
 
         return True
-
-    def set_xy(self, x, y):
-        self._target_x = x
-        self._target_y = y
 
     def get_objective(self):
         out = {}

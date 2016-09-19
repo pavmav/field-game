@@ -169,6 +169,12 @@ class Creature(Entity):
                                                "substance_type": type(substances.Substance())})
             self.action_queue.append(extract_substance)
 
+    def queue_action(self, action, objectives, index=None):
+        if index is None:
+            self.action_queue.append({"action": action, "objectives": objectives})
+        else:
+            self.action_queue.insert(index, {"action": action, "objectives": objectives})
+
     def die(self):
         self.alive = False
         self.time_of_death = self.z
