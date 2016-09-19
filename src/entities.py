@@ -132,7 +132,7 @@ class Creature(Entity):
             self.die()
             return
 
-        if len(self.action_queue) == 0:
+        if self.need_to_update_plan():
             self.plan()
 
         if len(self.action_queue) > 0:
@@ -178,6 +178,9 @@ class Creature(Entity):
     def die(self):
         self.alive = False
         self.time_of_death = self.z
+
+    def need_to_update_plan(self):
+        return len(self.action_queue) == 0
 
     @classmethod
     def class_name(cls):
