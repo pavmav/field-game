@@ -132,26 +132,29 @@ class Creature(Entity):
             self.die()
             return
 
-        if len(self.action_queue) == 0:
+        if self.need_to_update_plan():
             self.plan()
 
         if len(self.action_queue) > 0:
-            if self.action_queue[0].action_possible():
-                self.action_queue[0].do()
 
-                if self.action_queue[0].accomplished:
-                    self.action_log.append(self.action_queue.pop(0))
+            current_action = self.action_queue[0]
 
-            else:
+            current_results = current_action.do_results()
 
+            if current_results["done"] or not current_action.action_possible():
                 self.action_log.append(self.action_queue.pop(0))
+            #
+            # else:
+            #
+            #     self.action_log.append(self.action_queue.pop(0))
 
     def plan(self):
         find_substance = actions.SearchSubstance(self)
         find_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-        search_results = find_substance.get_result()
-        if search_results:
-            x, y = search_results
+        search_results = find_substance.do_results()
+
+        if search_results["accomplished"]:
+            x, y = search_results["substance_x"], search_results["substance_y"]
         else:
             x = random.randint(1, self.board.length - 2)
             y = random.randint(1, self.board.height - 2)
@@ -161,23 +164,55 @@ class Creature(Entity):
 
         self.action_queue.append(move)
 
-        if search_results:
+        if search_results["accomplished"]:
             extract_substance = actions.ExtractSubstanceXY(self)
-            # extract_substance.set_objective(x, y, type(substances.Substance()))
             extract_substance.set_objective(**{"substance_x": x,
                                                "substance_y": y,
                                                "substance_type": type(substances.Substance())})
             self.action_queue.append(extract_substance)
 
-    def queue_action(self, action, objectives, index=None):
+    def die(self):
+        self.alive = False
+        self.time_of_death = self.z
+
+    def need_to_update_plan(self):
+        return len(self.action_queue) == 0
+
+    def queue_action(self, action, objectives={}, index=None):
         if index is None:
             self.action_queue.append({"action": action, "objectives": objectives})
         else:
             self.action_queue.insert(index, {"action": action, "objectives": objectives})
 
-    def die(self):
-        self.alive = False
-        self.time_of_death = self.z
+    def perform_current_action(self):
+        if len(self.action_queue) == 0:
+            return
+
+        current_queue_action = self.action_queue.pop(0)
+
+        action_to_do = current_queue_action["action"]
+        objectives = current_queue_action["objectives"]
+
+        if objectives is None:
+            if action_to_do.get_objective() is None:
+                pass  # no objectives to set - move to log   TODO get_objective must return None if no valid objectives
+            else:
+                pass  # objectives are set, OK to perform
+        elif isinstance(objectives, dict):
+            # set objectives from queue
+            action_to_do.set_objective(**objectives)
+        elif isinstance(objectives, actions.Action):
+            # set objectives of objective action's result
+            action_to_do.set_objective(**objectives.results)
+        else:
+            raise ValueError()  # objectives should be None, dict or Action
+
+        # TODO perform action, move to log
+
+        current_queue_action.do()
+
+        if current_queue_action.results["done"]:
+            self.action_log.append(current_queue_action)
 
     @classmethod
     def class_name(cls):
@@ -199,7 +234,7 @@ class BreedingGround(Entity):
         if not self.board.cell_passable(self.x, self.y):
             return
 
-        if random.random() < 0.05:
+        if random.random() < 0.2:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)
 
