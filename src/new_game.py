@@ -15,7 +15,7 @@ WIN_HEIGHT = 640  # Высота
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)  # Группируем ширину и высоту в одну переменную
 BACKGROUND_COLOR = "#004400"
 PLATFORM_WIDTH = 10
-PLATFORM_HEIGHT = 10
+PLATFORM_HEIGHT = 10 
 
 
 def main():

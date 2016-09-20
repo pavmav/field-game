@@ -27,8 +27,16 @@
       <file leaf-file-name="new_game.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/new_game.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
             <state relative-caret-position="204">
               <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+||||||| merged common ancestors
+            <state relative-caret-position="231">
+              <caret line="73" column="35" selection-start-line="73" selection-start-column="35" selection-end-line="73" selection-end-column="35" />
+=======
+            <state relative-caret-position="146">
+              <caret line="68" column="25" selection-start-line="68" selection-start-column="25" selection-end-line="68" selection-end-column="25" />
+>>>>>>> Stashed changes
               <folding />
             </state>
           </provider>
@@ -162,6 +170,7 @@
         <option value="Pavel Mavrichev &lt;pavel.mavrichev@gmail.com&gt;" />
       </list>
     </option>
+    <option name="UPDATE_TYPE" value="MERGE" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="PUSH_TAGS">
       <GitPushTagMode />
@@ -741,7 +750,76 @@
       <option name="project" value="LOCAL" />
       <updated>1474289663001</updated>
     </task>
+<<<<<<< Updated upstream
     <option name="localTasksCounter" value="36" />
+||||||| merged common ancestors
+    <task id="LOCAL-00036" summary="add substance, needs lots lots lots of refactoring and thinking&#10;">
+      <created>1474292138008</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1474292138008</updated>
+    </task>
+    <task id="LOCAL-00037" summary="add substance, needs lots lots lots of refactoring and thinking&#10;">
+      <created>1474294187663</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1474294187663</updated>
+    </task>
+    <task id="LOCAL-00038" summary="needs lots of refactoring and thinking&#10;">
+      <created>1474378818580</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1474378818580</updated>
+    </task>
+    <task id="LOCAL-00039" summary="needs lots of refactoring and thinking, save/load&#10;">
+      <created>1474383455004</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1474383455004</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
+=======
+    <task id="LOCAL-00036" summary="add substance, needs lots lots lots of refactoring and thinking&#10;">
+      <created>1474292138008</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1474292138008</updated>
+    </task>
+    <task id="LOCAL-00037" summary="add substance, needs lots lots lots of refactoring and thinking&#10;">
+      <created>1474294187663</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1474294187663</updated>
+    </task>
+    <task id="LOCAL-00038" summary="needs lots of refactoring and thinking&#10;">
+      <created>1474378818580</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1474378818580</updated>
+    </task>
+    <task id="LOCAL-00039" summary="needs lots of refactoring and thinking, save/load&#10;">
+      <created>1474383455004</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1474383455004</updated>
+    </task>
+    <task id="LOCAL-00040" summary="needs lots of refactoring and thinking, save/load&#10;">
+      <created>1474383807178</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1474383807178</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
+>>>>>>> Stashed changes
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -1536,5 +1614,25 @@
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+    <entry file="file://$PROJECT_DIR$/src/new_game.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="73" column="35" selection-start-line="73" selection-start-column="35" selection-end-line="73" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+=======
+    <entry file="file://$PROJECT_DIR$/src/new_game.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="146">
+          <caret line="68" column="25" selection-start-line="68" selection-start-column="25" selection-end-line="68" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+>>>>>>> Stashed changes
   </component>
 </project>
