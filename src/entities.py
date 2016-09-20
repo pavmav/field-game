@@ -234,7 +234,7 @@ class BreedingGround(Entity):
         if not self.board.cell_passable(self.x, self.y):
             return
 
-        if random.random() < 0.05:
+        if random.random() < 0.2:
             new_creature = Creature()
             self.board.insert_object(self.x, self.y, new_creature)
 

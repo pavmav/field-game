@@ -3,9 +3,12 @@
 import pygame
 from pygame import *
 
+import tkinter as tk
+import tkFileDialog
+
 # <editor-fold desc="Field">
 from field import *
-# import __field
+import field
 
 # </editor-fold>
 
@@ -58,6 +61,20 @@ def main():
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_SPACE:
+                    f.pause = not f.pause
+                elif e.key == pygame.K_s:
+                    root = tk.Tk()
+                    root.withdraw()
+                    file_path = tkFileDialog.asksaveasfilename()
+                    f.save_pickle(file_path)
+                elif e.key == pygame.K_l:
+                    root = tk.Tk()
+                    root.withdraw()
+                    file_path = tkFileDialog.askopenfilename()
+                    f = field.load_from_pickle(file_path)
+                    f.pause = True
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
