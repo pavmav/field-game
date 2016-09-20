@@ -8,26 +8,39 @@ class Action(object):
         # self.time_start = subject.board.epoch
         # self.time_finish = None
 
-    def do(self):
-        self._done = True
-
-    def get_result(self):
-        out = {"done": self._done, "accomplished": self.accomplished}
-        return out
-
     def get_objective(self):
         return {}
 
-    def set_objective(self, **kwargs):
+    def set_objective(self, control=False, **kwargs):
         valid_objectives = self.get_objective().keys()
 
         for key in kwargs.keys():
             if not key in valid_objectives:
-                raise ValueError("{0} is not a valid objective".format(key))
-            setattr(self, "_{0}".format(key), kwargs[key])
+                if control:
+                    raise ValueError("{0} is not a valid objective".format(key))
+                else:
+                    pass  # maybe need to print
+            else:
+                setattr(self, "_{0}".format(key), kwargs[key])
 
     def action_possible(self):
         return True
+
+    def do(self):
+        self.check_set_results()
+        self._done = True
+
+    def check_set_results(self):
+        self.accomplished = True
+
+    @property
+    def results(self):
+        out = {"done": self._done, "accomplished": self.accomplished}
+        return out
+
+    def do_results(self):
+        self.do()
+        return self.results
 
 
 class MovementXY(Action):
@@ -38,6 +51,14 @@ class MovementXY(Action):
         self._target_y = None
 
         self.path = []
+
+    def get_objective(self):
+        out = {}
+
+        out["target_x"] = self._target_x
+        out["target_y"] = self._target_y
+
+        return out
 
     def action_possible(self):
 
@@ -51,6 +72,35 @@ class MovementXY(Action):
             return False
 
         return True
+
+    def do(self):
+
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        if not self.path or not self.check_path_passable():
+            self.initialize_path()
+
+        if not self.path:
+            self.check_set_results()
+            self._done = True
+            return
+
+        current_step_x, current_step_y = self.path.pop(0)
+
+        if self.subject.board.cell_passable(current_step_x, current_step_y):
+            self.subject.board.remove_object(self.subject, self.subject.x, self.subject.y)
+            self.subject.board.insert_object(current_step_x, current_step_y, self.subject, epoch=1)
+
+        self.check_set_results()
+
+        self._done = self.results["accomplished"]
+
+    def check_set_results(self):
+        self.accomplished = (self.subject.x == self._target_x and self.subject.y == self._target_y)
 
     def initialize_path(self):
         field_map = self.__make_map()
@@ -141,40 +191,6 @@ class MovementXY(Action):
 
         return True
 
-    def get_objective(self):
-        out = {}
-
-        out["target_x"] = self._target_x
-        out["target_y"] = self._target_y
-
-        return out
-
-    def do(self):
-        super(MovementXY, self).do()
-        self.check_set_accomplishment()
-        if self.accomplished:
-            return True
-
-        if not self.path or not self.check_path_passable():
-            self.initialize_path()
-
-        if not self.path:
-            return self.accomplished
-
-        current_step_x, current_step_y = self.path[0]
-
-        if self.subject.board.cell_passable(current_step_x, current_step_y):
-            self.subject.board.remove_object(self.subject, self.subject.x, self.subject.y)
-            self.subject.board.insert_object(current_step_x, current_step_y, self.subject, epoch=1)
-            self.path.pop(0)
-
-        self.check_set_accomplishment()
-
-        return self.accomplished
-
-    def check_set_accomplishment(self):
-        self.accomplished = (self.subject.x == self._target_x and self.subject.y == self._target_y)
-
 
 class SearchSubstance(Action):
     def __init__(self, subject):
@@ -185,15 +201,6 @@ class SearchSubstance(Action):
         self._substance_x = None
         self._substance_y = None
 
-    def action_possible(self):
-        if self._target_substance_type is None:
-            return False
-
-        return True
-
-    def set_target(self, substance_type):
-        self._target_substance_type = substance_type
-
     def get_objective(self):
         out = {}
 
@@ -201,18 +208,35 @@ class SearchSubstance(Action):
 
         return out
 
-    def get_result(self):
+    def action_possible(self):
+        if self._target_substance_type is None:
+            return False
+
+        return True
+
+    def do(self):
+        if self.results["done"]:
+            return
 
         if not self.action_possible():
-            return self.accomplished
+            return
 
-        if not self.accomplished:
-            self.do()
+        self.search()
 
-        if self._substance_x is None or self._substance_y is None:
-            return self.accomplished
+        self.check_set_results()
+        self._done = True
 
-        return self._substance_x, self._substance_y
+    def check_set_results(self):
+        self.accomplished = (self._substance_x is not None and self._substance_y is not None)
+
+    @property
+    def results(self):
+        out = super(SearchSubstance, self).results
+
+        out["substance_x"] = self._substance_x
+        out["substance_y"] = self._substance_y
+
+        return out
 
     def search(self):
         continue_search = False
@@ -220,18 +244,15 @@ class SearchSubstance(Action):
 
         while continue_search or radius == 1:
             continue_search = False
-            # print radius
             for x in range(self.subject.x - radius, self.subject.x + radius + 1):
                 if x == self.subject.x - radius or x == self.subject.x + radius:
                     for y in range(self.subject.y - radius, self.subject.y + radius + 1):
                         if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
-                                # print self._target_substance_type
                                 if element.contains(self._target_substance_type) and not element.alive:
                                     self._substance_x = x
                                     self._substance_y = y
-                                    self.accomplished = True
                                     return
                             continue_search = True
                 else:
@@ -243,17 +264,9 @@ class SearchSubstance(Action):
                                 if element.contains(self._target_substance_type) and not element.alive:
                                     self._substance_x = x
                                     self._substance_y = y
-                                    self.accomplished = True
                                     return
                             continue_search = True
-
-                        # print x, y
-
             radius += 1
-
-    def do(self):
-        super(SearchSubstance, self).do()
-        self.search()
 
 
 class ExtractSubstanceXY(Action):
@@ -264,6 +277,15 @@ class ExtractSubstanceXY(Action):
         self._substance_y = None
 
         self._substance_type = None
+
+    def get_objective(self):
+        out = {}
+
+        out["substance_type"] = self._substance_type
+        out["substance_x"] = self._substance_x
+        out["substance_y"] = self._substance_y
+
+        return out
 
     def action_possible(self):
         if self._substance_x is None or self._substance_y is None or self._substance_type is None:
@@ -287,25 +309,27 @@ class ExtractSubstanceXY(Action):
 
         return True
 
-    def get_objective(self):
-        out = {}
-
-        out["substance_type"] = self._substance_type
-        out["substance_x"] = self._substance_x
-        out["substance_y"] = self._substance_y
-
-        return out
-
-    def get_result(self):
-        return super(ExtractSubstanceXY, self).get_result()
-
     def do(self):
-        super(ExtractSubstanceXY, self).do()
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
 
         cell = self.subject.board.get_cell(self._substance_x, self._substance_y)
+
+        extracted = False
 
         for element in cell:
             if element.contains(self._substance_type):
                 self.subject.pocket(element.extract(self._substance_type))
-                self.accomplished = True
+                extracted = True
                 break
+
+        if extracted:
+            self.check_set_results()
+
+        self._done = True
+
+    def check_set_results(self):
+        self.accomplished = True

@@ -10,6 +10,7 @@ class Field(object):
         self.__height = height
         self.__field = []
         self.__epoch = 0
+        self.pause = False
 
         for y in range(self.__height):
             row = []
@@ -98,6 +99,9 @@ class Field(object):
                         cell.remove(entity_object)
 
     def make_time(self):
+        if self.pause:
+            return
+
         for y in range(self.height):
             for x in range(self.length):
                 for element in self.__field[y][x]:
