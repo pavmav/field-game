@@ -83,7 +83,7 @@ class Blank(Entity):
     def live(self):
         super(Blank, self).live()
 
-        if random.random() <= 0.0005:
+        if random.random() <= 0.0002:
             self._container.append(substances.Substance())
 
         if len(self._container) > 0:
@@ -113,7 +113,12 @@ class Creature(Entity):
         self.scenery = False
         self.alive = True
         self.name = ''
-        self.color = "#550000"
+        self.sex = random.choice([True, False])
+        if self.sex:
+            self.color = "#550000"
+        else:
+            self.color = "#990000"
+        self.mortal = True
 
     def __str__(self):
         return '@'
@@ -143,12 +148,31 @@ class Creature(Entity):
 
             if current_results["done"] or not current_action.action_possible():
                 self.action_log.append(self.action_queue.pop(0))
-            #
-            # else:
-            #
-            #     self.action_log.append(self.action_queue.pop(0))
 
     def plan(self):
+
+        if self.sex:
+            fellow_creature = None
+
+            for row in self.board.get_field():
+                for cell in row:
+                    for element in cell:
+                        if isinstance(element, Creature) and element != self and element.sex != self.sex:
+                            fellow_creature = element
+
+            if fellow_creature is not None:
+
+                follow = actions.MovementToEntity(self)
+                follow.set_objective(**{"target_entity": fellow_creature})
+
+                self.action_queue.append(follow)
+
+                mate = actions.Mate(self)
+                mate.set_objective(**{"target_entity": fellow_creature})
+                self.action_queue.append(mate)
+
+                return
+
         find_substance = actions.SearchSubstance(self)
         find_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
         search_results = find_substance.do_results()
@@ -172,6 +196,8 @@ class Creature(Entity):
             self.action_queue.append(extract_substance)
 
     def die(self):
+        if not self.mortal:
+            return
         self.alive = False
         self.time_of_death = self.z
 
@@ -218,6 +244,20 @@ class Creature(Entity):
     def class_name(cls):
         return "Creature"
 
+    def can_mate(self, with_who):
+        if isinstance(with_who, Creature) and with_who.sex != self.sex:
+            if self.sex:
+                return True
+            else:
+                return True
+
+        return False
+
+    def will_mate(self, with_who):
+        if self.can_mate(with_who):
+            return True
+
+        return False
 
 class BreedingGround(Entity):
     def __init__(self):

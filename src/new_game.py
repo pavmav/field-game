@@ -3,9 +3,12 @@
 import pygame
 from pygame import *
 
+import tkinter as tk
+import tkFileDialog
+
 # <editor-fold desc="Field">
 from field import *
-# import __field
+import field
 
 # </editor-fold>
 
@@ -35,15 +38,20 @@ def main():
     f = Field(60, 40)
 
     b = Block()
-    g = Creature()
     c = Creature()
     c.name = "John"
+    g = Creature()
+    g.sex = not c.sex
+
+    c.mortal = False
+    g.mortal = False
+
     brg = BreedingGround()
 
     f.insert_object(5, 2, c)
     f.insert_object(30, 20, g)
     f.insert_object(3, 4, b)
-    f.insert_object(10, 15, brg)
+    # f.insert_object(10, 15, brg)
 
     level = f.list_obj_representation()
 
@@ -58,6 +66,20 @@ def main():
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_SPACE:
+                    f.pause = not f.pause
+                elif e.key == pygame.K_s:
+                    root = tk.Tk()
+                    root.withdraw()
+                    file_path = tkFileDialog.asksaveasfilename()
+                    f.save_pickle(file_path)
+                elif e.key == pygame.K_l:
+                    root = tk.Tk()
+                    root.withdraw()
+                    file_path = tkFileDialog.askopenfilename()
+                    f = field.load_from_pickle(file_path)
+                    f.pause = True
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import random
+import entities
+
 class Action(object):
     def __init__(self, subject):
         self.subject = subject
@@ -192,6 +195,83 @@ class MovementXY(Action):
         return True
 
 
+class MovementToEntity(MovementXY):
+    def __init__(self, subject):
+        super(MovementToEntity, self).__init__(subject)
+
+        self._target_entity = None
+
+    def get_objective(self):
+        out = {}
+
+        out["target_entity"] = self._target_entity
+
+        return out
+
+    def action_possible(self):
+
+        if self._target_entity is None:
+            return False
+
+        self.set_target_coordinates()
+
+        if self._target_x is None or self._target_y is None:
+            return False
+
+        if self.path is None or len(self.path) == 0:
+            self.initialize_path()
+
+        if self.path is None or len(self.path) == 0:
+            return False
+
+        return True
+
+    def do(self):
+
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        self.set_target_coordinates()
+
+        self.initialize_path()
+
+        if not self.action_possible():
+            return
+
+        super(MovementToEntity, self).do()
+
+        self.check_set_results()
+
+        self._done = self.results["accomplished"]
+
+    def check_set_results(self):
+        if self._target_entity.passable:
+            self.accomplished = (self.subject.x == self._target_x and self.subject.y == self._target_y)
+        else:
+            distance = abs(self.subject.x - self._target_entity.x) + abs(self.subject.y - self._target_entity.y)
+            self.accomplished = distance < 2
+
+    def set_target_coordinates(self):
+        if self._target_entity.passable:
+            self._target_x = self._target_entity.x
+            self._target_y = self._target_entity.y
+        else:
+            cells_near = []
+            if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y+1):
+                cells_near.append((self._target_entity.x, self._target_entity.y+1))
+            if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y-1):
+                cells_near.append((self._target_entity.x, self._target_entity.y-1))
+            if self.subject.board.cell_passable(self._target_entity.x+1, self._target_entity.y):
+                cells_near.append((self._target_entity.x+1, self._target_entity.y))
+            if self.subject.board.cell_passable(self._target_entity.x-1, self._target_entity.y):
+                cells_near.append((self._target_entity.x-1, self._target_entity.y))
+            if len(cells_near) == 0:
+                return
+            self._target_x, self._target_y = random.choice(cells_near)
+
 class SearchSubstance(Action):
     def __init__(self, subject):
         super(SearchSubstance, self).__init__(subject)
@@ -333,3 +413,79 @@ class ExtractSubstanceXY(Action):
 
     def check_set_results(self):
         self.accomplished = True
+
+
+class Mate(Action):
+    def __init__(self, subject):
+        super(Mate, self).__init__(subject)
+
+        self._target_entity = None
+
+    def get_objective(self):
+        out = {}
+
+        out["target_entity"] = self._target_entity
+
+        return out
+
+    def action_possible(self):
+        if self._target_entity is None:
+            return False
+
+        if not self.subject.will_mate(self._target_entity) or not self._target_entity.will_mate(self.subject):
+            return False
+
+        distance = abs(self.subject.x - self._target_entity.x) + abs(self.subject.y - self._target_entity.y)
+        if distance > 1:
+            return False
+
+        if len(self.get_empty_cells_around_both()) == 0:
+            return False
+
+        return True
+
+    def do(self):
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        places_for_offsrings = self.get_empty_cells_around_both()
+
+        place = random.choice(places_for_offsrings)
+
+        offspring = entities.Creature()
+
+        self.subject.board.insert_object(place[0], place[1], offspring, epoch=1)
+
+        self._done = True
+
+        self.check_set_results()
+
+        self._done = self.results["accomplished"]
+
+    def check_set_results(self):
+        self.accomplished = self._done
+
+    def get_empty_cells_around_both(self):
+        cells_near = []
+        if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y + 1):
+            cells_near.append((self._target_entity.x, self._target_entity.y + 1))
+        if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y - 1):
+            cells_near.append((self._target_entity.x, self._target_entity.y - 1))
+        if self.subject.board.cell_passable(self._target_entity.x + 1, self._target_entity.y):
+            cells_near.append((self._target_entity.x + 1, self._target_entity.y))
+        if self.subject.board.cell_passable(self._target_entity.x - 1, self._target_entity.y):
+            cells_near.append((self._target_entity.x - 1, self._target_entity.y))
+
+        if self.subject.board.cell_passable(self.subject.x, self.subject.y + 1):
+            cells_near.append((self.subject.x, self.subject.y + 1))
+        if self.subject.board.cell_passable(self.subject.x, self.subject.y - 1):
+            cells_near.append((self.subject.x, self.subject.y - 1))
+        if self.subject.board.cell_passable(self.subject.x + 1, self.subject.y):
+            cells_near.append((self.subject.x + 1, self.subject.y))
+        if self.subject.board.cell_passable(self.subject.x - 1, self.subject.y):
+            cells_near.append((self.subject.x - 1, self.subject.y))
+
+        return cells_near
