@@ -2,6 +2,7 @@
 
 import random
 import entities
+import math
 
 class Action(object):
     def __init__(self, subject):
@@ -270,7 +271,18 @@ class MovementToEntity(MovementXY):
                 cells_near.append((self._target_entity.x-1, self._target_entity.y))
             if len(cells_near) == 0:
                 return
-            self._target_x, self._target_y = random.choice(cells_near)
+
+            best_coordinates = random.choice(cells_near)
+            smallest_distance = 9e10
+
+            for coordinates in cells_near:
+                distance = math.sqrt((self.subject.x - coordinates[0])**2 + (self.subject.y - coordinates[1])**2)
+
+                if distance < smallest_distance:
+                    smallest_distance = distance
+                    best_coordinates = coordinates
+
+            self._target_x, self._target_y = best_coordinates
 
 
 class SearchSubstance(Action):

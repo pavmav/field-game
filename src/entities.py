@@ -96,6 +96,7 @@ class Entity(object):
 
         return None
 
+
 class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
