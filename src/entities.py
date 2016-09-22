@@ -3,6 +3,7 @@
 import random
 import actions
 import substances
+import math
 
 
 class Entity(object):
@@ -66,6 +67,34 @@ class Entity(object):
     def class_name(cls):
         return "Entity"
 
+    def find_nearest_coordinates_by_type(self, type_to_find):
+
+        list_found = self.board.find_all_coordinates_by_type(type_to_find)
+
+        smallest_distance = 9e10
+        closest_so_far = None
+
+        for coordinates in list_found:
+            distance = math.sqrt((self.x - coordinates[0])**2 + (self.y - coordinates[1])**2)
+            if distance <= smallest_distance:
+                smallest_distance = distance
+                closest_so_far = coordinates
+
+        return closest_so_far
+
+    def find_nearest_entity_by_type(self, type_to_find):
+        coordinates = self.find_nearest_coordinates_by_type(type_to_find)
+
+        if coordinates is None:
+            return None
+
+        cell = self.board.get_cell(**coordinates)
+
+        for element in cell:
+            if isinstance(element, type_to_find):
+                return element
+
+        return None
 
 class Blank(Entity):
     def __init__(self):
@@ -152,13 +181,21 @@ class Creature(Entity):
     def plan(self):
 
         if self.sex:
-            fellow_creature = None
 
-            for row in self.board.get_field():
-                for cell in row:
-                    for element in cell:
-                        if isinstance(element, Creature) and element != self and element.sex != self.sex:
-                            fellow_creature = element
+            list_creatures = self.board.find_all_entities_by_type(Creature)
+
+            smallest_distance = 9e10
+            closest_so_far = None
+
+            for possible_partner in list_creatures:
+                if possible_partner == self or possible_partner.sex == self.sex:
+                    continue
+                distance = math.sqrt((self.x - possible_partner.x) ** 2 + (self.y - possible_partner.y) ** 2)
+                if distance <= smallest_distance:
+                    smallest_distance = distance
+                    closest_so_far = possible_partner
+
+            fellow_creature = closest_so_far
 
             if fellow_creature is not None:
 
@@ -254,10 +291,13 @@ class Creature(Entity):
         return False
 
     def will_mate(self, with_who):
-        if self.can_mate(with_who):
-            return True
+        if self.sex:
+            return self.can_mate(with_who)
+        else:
+            return random.choice([False, self.can_mate(with_who)])
 
         return False
+
 
 class BreedingGround(Entity):
     def __init__(self):

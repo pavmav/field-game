@@ -272,6 +272,7 @@ class MovementToEntity(MovementXY):
                 return
             self._target_x, self._target_y = random.choice(cells_near)
 
+
 class SearchSubstance(Action):
     def __init__(self, subject):
         super(SearchSubstance, self).__init__(subject)

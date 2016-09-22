@@ -165,6 +165,37 @@ class Field(object):
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
 
+    def find_all_coordinates_by_type(self, type_to_find):
+        field = self.__field
+
+        list_found = []
+
+        for y, row in enumerate(field):
+            for x, cell in enumerate(row):
+                for element in cell:
+                    if isinstance(element, type_to_find):
+                        if (x, y) not in list_found:
+                            list_found.append((x, y))
+                    if element.contains(type_to_find):
+                        if (x, y) not in list_found:
+                            list_found.append((x, y))
+
+        return list_found
+
+    def find_all_entities_by_type(self, type_to_find):
+        field = self.__field
+
+        list_found = []
+
+        for row in field:
+            for cell in row:
+                for element in cell:
+                    if isinstance(element, type_to_find):
+                        if element not in list_found:
+                            list_found.append(element)
+
+        return list_found
+
 
 def load_from_pickle(filename):
     with open(filename, 'rb') as f:
