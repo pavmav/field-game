@@ -29,6 +29,7 @@ class Entity(object):
         self.passable = False
         self.scenery = True
         self._container = []
+        self._states_list = []
 
         # visualization properties
         self.color = "#004400"
@@ -57,6 +58,7 @@ class Entity(object):
             self._container.append(substance_object)
 
     def live(self):
+        self.get_affected()
         self.z += 1
         self.age += 1
 
@@ -95,6 +97,10 @@ class Entity(object):
                 return element
 
         return None
+
+    def get_affected(self):
+        for state in self._states_list:
+            state.affect()
 
 
 class Blank(Entity):
@@ -178,6 +184,14 @@ class Creature(Entity):
 
             if current_results["done"] or not current_action.action_possible():
                 self.action_log.append(self.action_queue.pop(0))
+
+            while len(self.action_queue) > 0 and self.action_queue[0].instant:
+                current_action = self.action_queue[0]
+
+                current_results = current_action.do_results()
+
+                if current_results["done"] or not current_action.action_possible():
+                    self.action_log.append(self.action_queue.pop(0))
 
     def plan(self):
 

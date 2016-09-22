@@ -3,12 +3,14 @@
 import random
 import entities
 import math
+import states
 
 class Action(object):
     def __init__(self, subject):
         self.subject = subject
         self.accomplished = False
         self._done = False
+        self.instant = False
         # self.time_start = subject.board.epoch
         # self.time_finish = None
 
@@ -289,6 +291,8 @@ class SearchSubstance(Action):
     def __init__(self, subject):
         super(SearchSubstance, self).__init__(subject)
 
+        self.instant = True
+
         self._target_substance_type = None
 
         self._substance_x = None
@@ -366,6 +370,8 @@ class ExtractSubstanceXY(Action):
     def __init__(self, subject):
         super(ExtractSubstanceXY, self).__init__(subject)
 
+        self.instant = True
+
         self._substance_x = None
         self._substance_y = None
 
@@ -432,6 +438,8 @@ class Mate(Action):
     def __init__(self, subject):
         super(Mate, self).__init__(subject)
 
+        self.instant = True
+
         self._target_entity = None
 
     def get_objective(self):
@@ -452,7 +460,32 @@ class Mate(Action):
         if distance > 1:
             return False
 
-        if len(self.get_empty_cells_around_both()) == 0:
+        return True
+
+    def do(self):
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        self._target_entity._states_list.append(states.Pregnant(self._target_entity))
+
+        self._done = True
+
+        self.check_set_results()
+
+        self._done = self.results["accomplished"]
+
+    def check_set_results(self):
+        self.accomplished = self._done
+
+
+class GiveBirth(Action):
+    def action_possible(self):
+        cells_around = self.get_empty_cells_around()
+
+        if not cells_around:
             return False
 
         return True
@@ -464,9 +497,9 @@ class Mate(Action):
         if not self.action_possible():
             return
 
-        places_for_offsrings = self.get_empty_cells_around_both()
+        cells_around = self.get_empty_cells_around()
 
-        place = random.choice(places_for_offsrings)
+        place = random.choice(cells_around)
 
         offspring = entities.Creature()
 
@@ -476,21 +509,8 @@ class Mate(Action):
 
         self.check_set_results()
 
-        self._done = self.results["accomplished"]
-
-    def check_set_results(self):
-        self.accomplished = self._done
-
-    def get_empty_cells_around_both(self):
+    def get_empty_cells_around(self):
         cells_near = []
-        if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y + 1):
-            cells_near.append((self._target_entity.x, self._target_entity.y + 1))
-        if self.subject.board.cell_passable(self._target_entity.x, self._target_entity.y - 1):
-            cells_near.append((self._target_entity.x, self._target_entity.y - 1))
-        if self.subject.board.cell_passable(self._target_entity.x + 1, self._target_entity.y):
-            cells_near.append((self._target_entity.x + 1, self._target_entity.y))
-        if self.subject.board.cell_passable(self._target_entity.x - 1, self._target_entity.y):
-            cells_near.append((self._target_entity.x - 1, self._target_entity.y))
 
         if self.subject.board.cell_passable(self.subject.x, self.subject.y + 1):
             cells_near.append((self.subject.x, self.subject.y + 1))
