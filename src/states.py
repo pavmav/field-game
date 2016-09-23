@@ -21,5 +21,5 @@ class Pregnant(State):
         super(Pregnant, self).affect()
 
         if self.duration == self.timing:
-            self.subject.action_queue.insert(0, actions.GiveBirth(self.subject))
+            self.subject.action_queue.insert(0, actions.GiveBirth(self.subject, self))
 

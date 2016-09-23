@@ -482,6 +482,11 @@ class Mate(Action):
 
 
 class GiveBirth(Action):
+    def __init__(self, subject, pregnant_state):
+        super(GiveBirth, self).__init__(subject)
+
+        self.pregnant_state = pregnant_state
+
     def action_possible(self):
         cells_around = self.get_empty_cells_around()
 
@@ -504,6 +509,8 @@ class GiveBirth(Action):
         offspring = entities.Creature()
 
         self.subject.board.insert_object(place[0], place[1], offspring, epoch=1)
+
+        self.subject._states_list.remove(self.pregnant_state)
 
         self._done = True
 

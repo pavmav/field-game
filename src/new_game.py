@@ -62,7 +62,7 @@ def main():
     timer = pygame.time.Clock()
 
     while 1:  # Основной цикл программы
-        timer.tick(10)
+        timer.tick(100)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"

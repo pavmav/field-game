@@ -4,6 +4,7 @@ import random
 import actions
 import substances
 import math
+import states
 
 
 class Entity(object):
@@ -102,6 +103,11 @@ class Entity(object):
         for state in self._states_list:
             state.affect()
 
+    def has_state(self, state_type):
+        for state in self._states_list:
+            if isinstance(state, state_type):
+                return True
+        return False
 
 class Blank(Entity):
     def __init__(self):
@@ -161,7 +167,6 @@ class Creature(Entity):
 
     def live(self):
         super(Creature, self).live()
-
         if (self.time_of_death is not None) and self.z - self.time_of_death > 10:
             self.dissolve()
             return
@@ -203,7 +208,7 @@ class Creature(Entity):
             closest_so_far = None
 
             for possible_partner in list_creatures:
-                if possible_partner == self or possible_partner.sex == self.sex:
+                if possible_partner == self or possible_partner.sex == self.sex or not possible_partner.can_mate(self):
                     continue
                 distance = math.sqrt((self.x - possible_partner.x) ** 2 + (self.y - possible_partner.y) ** 2)
                 if distance <= smallest_distance:
@@ -301,17 +306,18 @@ class Creature(Entity):
             if self.sex:
                 return True
             else:
-                return True
+                return not self.has_state(states.Pregnant)
 
         return False
 
     def will_mate(self, with_who):
-        if self.sex:
-            return self.can_mate(with_who)
-        else:
-            return random.choice([False, self.can_mate(with_who)])
+        if not self.can_mate(with_who):
+            return False
 
-        return False
+        if self.sex:
+            return True
+        else:
+            return True
 
 
 class BreedingGround(Entity):
