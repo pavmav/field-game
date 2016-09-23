@@ -20,7 +20,6 @@ BACKGROUND_COLOR = "#004400"
 PLATFORM_WIDTH = 10
 PLATFORM_HEIGHT = 10
 
-
 def main():
     pygame.init()  # Инициация PyGame, обязательная строчка
     screen = pygame.display.set_mode(DISPLAY)  # Создаем окошко
@@ -57,12 +56,14 @@ def main():
 
     # f = __field.load_from_pickle("__field.pickle")
 
+    tick = 10
+
     # </editor-fold>
 
     timer = pygame.time.Clock()
 
     while 1:  # Основной цикл программы
-        timer.tick(100)
+        timer.tick(tick)
         for e in pygame.event.get():  # Обрабатываем события
             if e.type == QUIT:
                 raise SystemExit, "QUIT"
@@ -80,6 +81,10 @@ def main():
                     file_path = tkFileDialog.askopenfilename()
                     f = field.load_from_pickle(file_path)
                     f.pause = True
+                elif e.key == pygame.K_UP:
+                    tick += 10
+                elif e.key == pygame.K_DOWN and tick >= 11:
+                    tick -= 10
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 

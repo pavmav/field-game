@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="25e51531-36c9-4a04-85e6-c7b0a61bf193" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/actions.py" afterPath="$PROJECT_DIR$/src/actions.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/entities.py" afterPath="$PROJECT_DIR$/src/entities.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/new_game.py" afterPath="$PROJECT_DIR$/src/new_game.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/states.py" afterPath="$PROJECT_DIR$/src/states.py" />
     </list>
     <ignored path="game_1.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,8 +26,8 @@
       <file leaf-file-name="new_game.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/new_game.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
+            <state relative-caret-position="187">
+              <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
               <folding />
             </state>
           </provider>
@@ -39,8 +36,8 @@
       <file leaf-file-name="actions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/actions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="512" column="60" selection-start-line="512" selection-start-column="60" selection-end-line="512" selection-end-column="60" />
+            <state relative-caret-position="217">
+              <caret line="480" column="38" selection-start-line="480" selection-start-column="38" selection-end-line="480" selection-end-column="38" />
               <folding>
                 <element signature="e#25#38#0" expanded="true" />
                 <element signature="e#108#1233#0" expanded="false" />
@@ -182,10 +179,10 @@
         <option value="$PROJECT_DIR$/src/temp.py" />
         <option value="$PROJECT_DIR$/src/field.py" />
         <option value="$PROJECT_DIR$/src/state.py" />
-        <option value="$PROJECT_DIR$/src/new_game.py" />
         <option value="$PROJECT_DIR$/src/entities.py" />
         <option value="$PROJECT_DIR$/src/states.py" />
         <option value="$PROJECT_DIR$/src/actions.py" />
+        <option value="$PROJECT_DIR$/src/new_game.py" />
       </list>
     </option>
   </component>
@@ -804,7 +801,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474555385361</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="improved mating, single pregnancy, needs looooooots of refactoring&#10;">
+      <created>1474635171521</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1474635171521</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -912,7 +916,8 @@
     <MESSAGE value="add substance, needs lots lots lots of refactoring&#10;" />
     <MESSAGE value="improved mating, needs of refactoring&#10;" />
     <MESSAGE value="improved mating, needs looooooots of refactoring&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="improved mating, needs looooooots of refactoring&#10;" />
+    <MESSAGE value="improved mating, single pregnancy, needs looooooots of refactoring&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="improved mating, single pregnancy, needs looooooots of refactoring&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1424,14 +1429,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/state.py" />
-    <entry file="file://$PROJECT_DIR$/src/new_game.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/states.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="248">
@@ -1476,10 +1473,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/new_game.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/actions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="512" column="60" selection-start-line="512" selection-start-column="60" selection-end-line="512" selection-end-column="60" />
+        <state relative-caret-position="217">
+          <caret line="480" column="38" selection-start-line="480" selection-start-column="38" selection-end-line="480" selection-end-column="38" />
           <folding>
             <element signature="e#25#38#0" expanded="true" />
             <element signature="e#108#1233#0" expanded="false" />
