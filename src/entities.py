@@ -50,7 +50,7 @@ class Entity(object):
             if type(element) == substance_type:
                 substance_index = i
                 break
-        if substance_index == None:
+        if substance_index is None:
             return None
         return self._container.pop(substance_index)
 
@@ -261,7 +261,9 @@ class Creature(Entity):
     def need_to_update_plan(self):
         return len(self.action_queue) == 0
 
-    def queue_action(self, action, objectives={}, index=None):
+    def queue_action(self, action, objectives=None, index=None):
+        if objectives is None:
+            objectives = {}
         if index is None:
             self.action_queue.append({"action": action, "objectives": objectives})
         else:

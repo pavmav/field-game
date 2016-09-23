@@ -59,10 +59,7 @@ class MovementXY(Action):
         self.path = []
 
     def get_objective(self):
-        out = {}
-
-        out["target_x"] = self._target_x
-        out["target_y"] = self._target_y
+        out = {"target_x": self._target_x, "target_y": self._target_y}
 
         return out
 
@@ -205,9 +202,7 @@ class MovementToEntity(MovementXY):
         self._target_entity = None
 
     def get_objective(self):
-        out = {}
-
-        out["target_entity"] = self._target_entity
+        out = {"target_entity": self._target_entity}
 
         return out
 
@@ -299,9 +294,7 @@ class SearchSubstance(Action):
         self._substance_y = None
 
     def get_objective(self):
-        out = {}
-
-        out["target_substance_type"] = self._target_substance_type
+        out = {"target_substance_type": self._target_substance_type}
 
         return out
 
@@ -344,7 +337,7 @@ class SearchSubstance(Action):
             for x in range(self.subject.x - radius, self.subject.x + radius + 1):
                 if x == self.subject.x - radius or x == self.subject.x + radius:
                     for y in range(self.subject.y - radius, self.subject.y + radius + 1):
-                        if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
+                        if (0 <= x < self.subject.board.length) and (0 <= y < self.subject.board.height):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
                                 if element.contains(self._target_substance_type) and not element.alive:
@@ -354,7 +347,7 @@ class SearchSubstance(Action):
                             continue_search = True
                 else:
                     for y in [self.subject.y - radius, self.subject.y + radius]:
-                        if (x >= 0 and x < self.subject.board.length) and (y >= 0 and y < self.subject.board.height):
+                        if (0 <= x < self.subject.board.length) and (0 <= y < self.subject.board.height):
                             cell = self.subject.board.get_cell(x, y)
                             for element in cell:
                                 # print self._target_substance_type
@@ -378,11 +371,8 @@ class ExtractSubstanceXY(Action):
         self._substance_type = None
 
     def get_objective(self):
-        out = {}
-
-        out["substance_type"] = self._substance_type
-        out["substance_x"] = self._substance_x
-        out["substance_y"] = self._substance_y
+        out = {"substance_type": self._substance_type, "substance_x": self._substance_x,
+               "substance_y": self._substance_y}
 
         return out
 
@@ -443,9 +433,7 @@ class Mate(Action):
         self._target_entity = None
 
     def get_objective(self):
-        out = {}
-
-        out["target_entity"] = self._target_entity
+        out = {"target_entity": self._target_entity}
 
         return out
 
