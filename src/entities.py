@@ -109,6 +109,7 @@ class Entity(object):
                 return True
         return False
 
+
 class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
@@ -319,7 +320,7 @@ class Creature(Entity):
         if self.sex:
             return True
         else:
-            return True
+            return random.choice([True, False])
 
 
 class BreedingGround(Entity):
