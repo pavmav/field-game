@@ -262,14 +262,6 @@ class Creature(Entity):
     def need_to_update_plan(self):
         return len(self.action_queue) == 0
 
-    def queue_action(self, action, objectives=None, index=None):
-        if objectives is None:
-            objectives = {}
-        if index is None:
-            self.action_queue.append({"action": action, "objectives": objectives})
-        else:
-            self.action_queue.insert(index, {"action": action, "objectives": objectives})
-
     def perform_current_action(self):
         if len(self.action_queue) == 0:
             return

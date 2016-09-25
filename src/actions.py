@@ -197,11 +197,11 @@ class MovementXY(Action):
 
         return self.subject.board.cell_passable(self.path[0][0], self.path[0][1])
 
-        for step_coordinates in self.path:
-            if not self.subject.board.cell_passable(step_coordinates[0], step_coordinates[1]):
-                return False
-
-        return True
+        # for step_coordinates in self.path:
+        #     if not self.subject.board.cell_passable(step_coordinates[0], step_coordinates[1]):
+        #         return False
+        #
+        # return True
 
 
 class MovementToEntity(MovementXY):
