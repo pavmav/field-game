@@ -157,14 +157,21 @@ class MovementXY(Action):
 
             x, y = path[-1]
 
+            possible_steps = []
+
             if (len(field_map) - 1 >= y + 1) and (field_map[y + 1][x] == num_steps):
-                path.append((x, y + 1))
+                possible_steps.append((x, y + 1))
             elif (y > 0) and (field_map[y - 1][x] == num_steps):
-                path.append((x, y - 1))
+                possible_steps.append((x, y - 1))
             elif (len(field_map[y]) - 1 >= x + 1) and (field_map[y][x + 1] == num_steps):
-                path.append((x + 1, y))
+                possible_steps.append((x + 1, y))
             elif (x > 0) and (field_map[y][x - 1] == num_steps):
-                path.append((x - 1, y))
+                possible_steps.append((x - 1, y))
+
+            # for row in field_map:
+            #     print row
+
+            path.append(random.choice(possible_steps))
 
             num_steps -= 1
 
@@ -187,6 +194,8 @@ class MovementXY(Action):
         return field_map
 
     def check_path_passable(self):
+
+        return self.subject.board.cell_passable(self.path[0][0], self.path[0][1])
 
         for step_coordinates in self.path:
             if not self.subject.board.cell_passable(step_coordinates[0], step_coordinates[1]):
