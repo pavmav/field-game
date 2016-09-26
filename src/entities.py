@@ -38,6 +38,31 @@ class Entity(object):
     def __str__(self):
         raise Exception
 
+    @classmethod
+    def class_name(cls):
+        return "Entity"
+
+    def live(self):
+        self.get_affected()
+        self.z += 1
+        self.age += 1
+
+    def get_affected(self):
+        for state in self._states_list:
+            state.affect()
+
+    def has_state(self, state_type):
+        for state in self._states_list:
+            if isinstance(state, state_type):
+                return True
+        return False
+
+    def add_state(self, state):
+        self._states_list.append(state)
+
+    def remove_state(self, state):
+        self._states_list.remove(state)
+
     def contains(self, substance_type):
         for element in self._container:
             if type(element) == substance_type:
@@ -58,17 +83,8 @@ class Entity(object):
         if substance_object is not None:
             self._container.append(substance_object)
 
-    def live(self):
-        self.get_affected()
-        self.z += 1
-        self.age += 1
-
     def dissolve(self):
         self.board.remove_object(self)
-
-    @classmethod
-    def class_name(cls):
-        return "Entity"
 
     def find_nearest_coordinates_by_type(self, type_to_find):
 
@@ -78,7 +94,7 @@ class Entity(object):
         closest_so_far = None
 
         for coordinates in list_found:
-            distance = math.sqrt((self.x - coordinates[0])**2 + (self.y - coordinates[1])**2)
+            distance = math.sqrt((self.x - coordinates[0]) ** 2 + (self.y - coordinates[1]) ** 2)
             if distance <= smallest_distance:
                 smallest_distance = distance
                 closest_so_far = coordinates
@@ -98,16 +114,6 @@ class Entity(object):
                 return element
 
         return None
-
-    def get_affected(self):
-        for state in self._states_list:
-            state.affect()
-
-    def has_state(self, state_type):
-        for state in self._states_list:
-            if isinstance(state, state_type):
-                return True
-        return False
 
 
 class Blank(Entity):
@@ -166,6 +172,10 @@ class Creature(Entity):
     def __str__(self):
         return '@'
 
+    @classmethod
+    def class_name(cls):
+        return "Creature"
+
     def live(self):
         super(Creature, self).live()
         if (self.time_of_death is not None) and self.z - self.time_of_death > 10:
@@ -186,18 +196,15 @@ class Creature(Entity):
 
             current_action = self.action_queue[0]
 
-            current_results = current_action.do_results()
-
-            if current_results["done"] or not current_action.action_possible():
-                self.action_log.append(self.action_queue.pop(0))
+            self.perform_action(current_action)
 
             while len(self.action_queue) > 0 and self.action_queue[0].instant:
                 current_action = self.action_queue[0]
 
-                current_results = current_action.do_results()
+                self.perform_action(current_action)
 
-                if current_results["done"] or not current_action.action_possible():
-                    self.action_log.append(self.action_queue.pop(0))
+    def need_to_update_plan(self):
+        return len(self.action_queue) == 0
 
     def plan(self):
 
@@ -219,7 +226,6 @@ class Creature(Entity):
             fellow_creature = closest_so_far
 
             if fellow_creature is not None:
-
                 follow = actions.MovementToEntity(self)
                 follow.set_objective(**{"target_entity": fellow_creature})
 
@@ -259,45 +265,20 @@ class Creature(Entity):
         self.alive = False
         self.time_of_death = self.z
 
-    def need_to_update_plan(self):
-        return len(self.action_queue) == 0
+    def perform_action(self, action):
+        results = action.do_results()
 
-    def perform_current_action(self):
-        if len(self.action_queue) == 0:
-            return
+        if results["done"] or not action.action_possible():
+            self.action_log.append(self.action_queue.pop(0))
 
-        current_queue_action = self.action_queue.pop(0)
-
-        action_to_do = current_queue_action["action"]
-        objectives = current_queue_action["objectives"]
-
-        if objectives is None:
-            if action_to_do.get_objective() is None:
-                pass  # no objectives to set - move to log   TODO get_objective must return None if no valid objectives
-            else:
-                pass  # objectives are set, OK to perform
-        elif isinstance(objectives, dict):
-            # set objectives from queue
-            action_to_do.set_objective(**objectives)
-        elif isinstance(objectives, actions.Action):
-            # set objectives of objective action's result
-            action_to_do.set_objective(**objectives.results)
-        else:
-            raise ValueError()  # objectives should be None, dict or Action
-
-        # TODO perform action, move to log
-
-        current_queue_action.do()
-
-        if current_queue_action.results["done"]:
-            self.action_log.append(current_queue_action)
-
-    @classmethod
-    def class_name(cls):
-        return "Creature"
+        return results
 
     def can_mate(self, with_who):
         if isinstance(with_who, Creature) and with_who.sex != self.sex:
+
+            if not self.alive or not with_who.alive:
+                return False
+
             if self.sex:
                 return True
             else:

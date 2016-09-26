@@ -52,6 +52,15 @@ def main():
     f.insert_object(3, 4, b)
     # f.insert_object(10, 15, brg)
 
+    for y in range(10, 30):
+        f.insert_object(20, y, Block())
+
+    for x in range(21, 40):
+        f.insert_object(x, 10, Block())
+
+    for y in range(10, 30):
+        f.insert_object(40, y, Block())
+
     level = f.list_obj_representation()
 
     # f = __field.load_from_pickle("__field.pickle")

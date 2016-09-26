@@ -196,6 +196,91 @@ class Field(object):
 
         return list_found
 
+    def make_path(self, x1, y1, x2, y2):
+
+        if not self.cell_passable(x2, y2):
+            return []
+
+        field_map = self.__make_map()
+        self.__wave(field_map, x1, y1, x2, y2)
+
+        return self.__find_backwards(field_map, x2, y2)
+
+    def __make_map(self):
+        field_map = []
+
+        for input_row in self.__field:
+            row = []
+            for cell in input_row:
+                if cell[-1].passable:
+                    row.append(None)
+                else:
+                    row.append(-1)
+            field_map.append(row)
+
+        return field_map
+
+    @staticmethod
+    def __wave(field_map, x1, y1, x2, y2):
+        current_wave_list = [(x1, y1)]
+        field_map[y1][x1] = 0
+
+        while len(current_wave_list) > 0 and field_map[y2][x2] is None:
+            next_wave_list = []
+            for coordinates in current_wave_list:
+                x, y = coordinates
+                wave_num = field_map[y][x] + 1
+
+                if (len(field_map) - 1 >= y + 1) and field_map[y + 1][x] is None:
+                    field_map[y + 1][x] = wave_num
+                    next_wave_list.append((x, y + 1))
+
+                if (y > 0) and field_map[y - 1][x] is None:
+                    field_map[y - 1][x] = wave_num
+                    next_wave_list.append((x, y - 1))
+
+                if (len(field_map[y]) - 1 >= x + 1) and field_map[y][x + 1] is None:
+                    field_map[y][x + 1] = wave_num
+                    next_wave_list.append((x + 1, y))
+
+                if (x > 0) and field_map[y][x - 1] is None:
+                    field_map[y][x - 1] = wave_num
+                    next_wave_list.append((x - 1, y))
+
+            current_wave_list = next_wave_list[:]
+
+    @staticmethod
+    def __find_backwards(field_map, x2, y2):
+        num_steps = field_map[y2][x2]
+
+        if num_steps is None or num_steps == -1:
+            return None
+
+        path = [(x2, y2)]
+        num_steps -= 1
+
+        while num_steps > 0:
+
+            x, y = path[-1]
+
+            possible_steps = []
+
+            if (len(field_map) - 1 >= y + 1) and (field_map[y + 1][x] == num_steps):
+                possible_steps.append((x, y + 1))
+            elif (y > 0) and (field_map[y - 1][x] == num_steps):
+                possible_steps.append((x, y - 1))
+            elif (len(field_map[y]) - 1 >= x + 1) and (field_map[y][x + 1] == num_steps):
+                possible_steps.append((x + 1, y))
+            elif (x > 0) and (field_map[y][x - 1] == num_steps):
+                possible_steps.append((x - 1, y))
+
+            path.append(random.choice(possible_steps))
+
+            num_steps -= 1
+
+        path.reverse()
+
+        return path
 
 def load_from_pickle(filename):
     with open(filename, 'rb') as f:

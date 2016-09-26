@@ -106,102 +106,14 @@ class MovementXY(Action):
         self.accomplished = (self.subject.x == self._target_x and self.subject.y == self._target_y)
 
     def initialize_path(self):
-        field_map = self.__make_map()
-        self.__wave(field_map, self.subject.x, self.subject.y, self._target_x, self._target_y)
 
-        if field_map[self._target_y][self._target_x] == -1:
-            self.path = []
-
-        self.path = self.__find_backwards(field_map, self._target_x, self._target_y)
-
-    @staticmethod
-    def __wave(field_map, x1, y1, x2, y2):
-        current_wave_list = [(x1, y1)]
-        field_map[y1][x1] = 0
-
-        while len(current_wave_list) > 0 and field_map[y2][x2] is None:
-            next_wave_list = []
-            for coordinates in current_wave_list:
-                x, y = coordinates
-                wave_num = field_map[y][x] + 1
-
-                if (len(field_map) - 1 >= y + 1) and field_map[y + 1][x] is None:
-                    field_map[y + 1][x] = wave_num
-                    next_wave_list.append((x, y + 1))
-
-                if (y > 0) and field_map[y - 1][x] is None:
-                    field_map[y - 1][x] = wave_num
-                    next_wave_list.append((x, y - 1))
-
-                if (len(field_map[y]) - 1 >= x + 1) and field_map[y][x + 1] is None:
-                    field_map[y][x + 1] = wave_num
-                    next_wave_list.append((x + 1, y))
-
-                if (x > 0) and field_map[y][x - 1] is None:
-                    field_map[y][x - 1] = wave_num
-                    next_wave_list.append((x - 1, y))
-
-            current_wave_list = next_wave_list[:]
-
-    @staticmethod
-    def __find_backwards(field_map, x2, y2):
-        num_steps = field_map[y2][x2]
-
-        if num_steps is None or num_steps == -1:
-            return None
-
-        path = [(x2, y2)]
-        num_steps -= 1
-
-        while num_steps > 0:
-
-            x, y = path[-1]
-
-            possible_steps = []
-
-            if (len(field_map) - 1 >= y + 1) and (field_map[y + 1][x] == num_steps):
-                possible_steps.append((x, y + 1))
-            elif (y > 0) and (field_map[y - 1][x] == num_steps):
-                possible_steps.append((x, y - 1))
-            elif (len(field_map[y]) - 1 >= x + 1) and (field_map[y][x + 1] == num_steps):
-                possible_steps.append((x + 1, y))
-            elif (x > 0) and (field_map[y][x - 1] == num_steps):
-                possible_steps.append((x - 1, y))
-
-            # for row in field_map:
-            #     print row
-
-            path.append(random.choice(possible_steps))
-
-            num_steps -= 1
-
-        path.reverse()
-
-        return path
-
-    def __make_map(self):
-        field_map = []
-
-        for input_row in self.subject.board.get_field():
-            row = []
-            for cell in input_row:
-                if cell[-1].passable:
-                    row.append(None)
-                else:
-                    row.append(-1)
-            field_map.append(row)
-
-        return field_map
+        self.path = self.subject.board.make_path(self.subject.x, self.subject.y, self._target_x, self._target_y)
 
     def check_path_passable(self):
 
-        return self.subject.board.cell_passable(self.path[0][0], self.path[0][1])
+        next_step = self.path[0]
 
-        # for step_coordinates in self.path:
-        #     if not self.subject.board.cell_passable(step_coordinates[0], step_coordinates[1]):
-        #         return False
-        #
-        # return True
+        return self.subject.board.cell_passable(next_step[0], next_step[1])
 
 
 class MovementToEntity(MovementXY):
@@ -338,6 +250,31 @@ class SearchSubstance(Action):
         return out
 
     def search(self):
+        all_substance_coordinates = self.subject.board.find_all_coordinates_by_type(self._target_substance_type)
+
+        target_coordinates = None, None
+        shortest_distance = 9e10
+
+        for coordinates in all_substance_coordinates:
+            path = self.subject.board.make_path(self.subject.x, self.subject.y, coordinates[0], coordinates[1])
+
+            if not path:
+                continue
+
+            if len(path) < shortest_distance:
+                shortest_distance = len(path)
+                target_coordinates = coordinates
+
+        self._substance_x, self._substance_y = target_coordinates
+
+        # if target_coordinates != (None, None):
+        #     print self.subject.board.cell_passable(target_coordinates[0], target_coordinates[1])
+        #     print self.subject.board.get_cell(target_coordinates[0], target_coordinates[1])
+
+
+
+
+    def _search(self):
         continue_search = False
         radius = 1
 
@@ -466,7 +403,7 @@ class Mate(Action):
         if not self.action_possible():
             return
 
-        self._target_entity._states_list.append(states.Pregnant(self._target_entity))
+        self._target_entity.add_state(states.Pregnant(self._target_entity))
 
         self._done = True
 
@@ -507,7 +444,7 @@ class GiveBirth(Action):
 
         self.subject.board.insert_object(place[0], place[1], offspring, epoch=1)
 
-        self.subject._states_list.remove(self.pregnant_state)
+        self.subject.remove_state(self.pregnant_state)
 
         self._done = True
 
