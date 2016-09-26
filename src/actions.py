@@ -250,59 +250,38 @@ class SearchSubstance(Action):
         return out
 
     def search(self):
-        all_substance_coordinates = self.subject.board.find_all_coordinates_by_type(self._target_substance_type)
+        current_wave = [(self.subject.x, self.subject.y)]
+        checked = [(self.subject.x, self.subject.y)]
 
-        target_coordinates = None, None
-        shortest_distance = 9e10
+        # continue_search = True
 
-        for coordinates in all_substance_coordinates:
-            path = self.subject.board.make_path(self.subject.x, self.subject.y, coordinates[0], coordinates[1])
+        while current_wave:
+            next_wave = []
 
-            if not path:
-                continue
+            for wave_coordinates in current_wave:
+                x, y = wave_coordinates
+                coordinates_to_check = []
+                coordinates_to_check.append((x + 1, y))
+                coordinates_to_check.append((x - 1, y))
+                coordinates_to_check.append((x, y + 1))
+                coordinates_to_check.append((x, y - 1))
 
-            if len(path) < shortest_distance:
-                shortest_distance = len(path)
-                target_coordinates = coordinates
+                for coordinates in coordinates_to_check:
+                    if self.subject.board.coordinates_valid(coordinates[0], coordinates[1]) \
+                            and self.subject.board.cell_passable(coordinates[0], coordinates[1]) \
+                            and (coordinates[0], coordinates[1]) not in checked:
 
-        self._substance_x, self._substance_y = target_coordinates
+                        cell = self.subject.board.get_cell(coordinates[0], coordinates[1])
 
-        # if target_coordinates != (None, None):
-        #     print self.subject.board.cell_passable(target_coordinates[0], target_coordinates[1])
-        #     print self.subject.board.get_cell(target_coordinates[0], target_coordinates[1])
+                        for element in cell:
+                            if element.contains(self._target_substance_type):
+                                self._substance_x, self._substance_y = coordinates
+                                return
 
+                        next_wave.append(coordinates)
+                        checked.append(coordinates)
 
-
-
-    def _search(self):
-        continue_search = False
-        radius = 1
-
-        while continue_search or radius == 1:
-            continue_search = False
-            for x in range(self.subject.x - radius, self.subject.x + radius + 1):
-                if x == self.subject.x - radius or x == self.subject.x + radius:
-                    for y in range(self.subject.y - radius, self.subject.y + radius + 1):
-                        if (0 <= x < self.subject.board.length) and (0 <= y < self.subject.board.height):
-                            cell = self.subject.board.get_cell(x, y)
-                            for element in cell:
-                                if element.contains(self._target_substance_type) and not element.alive:
-                                    self._substance_x = x
-                                    self._substance_y = y
-                                    return
-                            continue_search = True
-                else:
-                    for y in [self.subject.y - radius, self.subject.y + radius]:
-                        if (0 <= x < self.subject.board.length) and (0 <= y < self.subject.board.height):
-                            cell = self.subject.board.get_cell(x, y)
-                            for element in cell:
-                                # print self._target_substance_type
-                                if element.contains(self._target_substance_type) and not element.alive:
-                                    self._substance_x = x
-                                    self._substance_y = y
-                                    return
-                            continue_search = True
-            radius += 1
+            current_wave = next_wave[:]
 
 
 class ExtractSubstanceXY(Action):

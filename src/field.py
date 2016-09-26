@@ -282,6 +282,16 @@ class Field(object):
 
         return path
 
+    def coordinates_valid(self, x, y):
+        if x < 0 or y < 0:
+            return False
+
+        if x >= self.length or y >= self.height:
+            return False
+
+        return True
+
+
 def load_from_pickle(filename):
     with open(filename, 'rb') as f:
         field = pickle.load(f)

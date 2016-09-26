@@ -210,7 +210,7 @@ class Creature(Entity):
 
         if self.sex:
 
-            list_creatures = self.board.find_all_entities_by_type(Creature)
+            list_creatures = self.board.find_all_entities_by_type(Creature)  # TODO rewrite wave search
 
             smallest_distance = 9e10
             closest_so_far = None
