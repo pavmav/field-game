@@ -5,6 +5,18 @@ import entities
 import math
 import states
 
+import cProfile
+
+def profile(func):
+    """Decorator for run function profile"""
+    def wrapper(*args, **kwargs):
+        profile_filename = func.__name__ + '.prof'
+        profiler = cProfile.Profile()
+        result = profiler.runcall(func, *args, **kwargs)
+        profiler.dump_stats(profile_filename)
+        return result
+    return wrapper
+
 class Action(object):
     def __init__(self, subject):
         self.subject = subject
@@ -251,7 +263,7 @@ class SearchSubstance(Action):
 
     def search(self):
         current_wave = [(self.subject.x, self.subject.y)]
-        checked = [(self.subject.x, self.subject.y)]
+        checked = set((self.subject.x, self.subject.y))
 
         while current_wave:
             next_wave = []
@@ -277,7 +289,7 @@ class SearchSubstance(Action):
                                 return
 
                         next_wave.append(coordinates)
-                        checked.append(coordinates)
+                        checked.add(coordinates)
 
             current_wave = next_wave[:]
 
@@ -313,23 +325,27 @@ class SearchMatingPartner(Action):
 
         return out
 
+    @profile
     def search(self):
         current_wave = [(self.subject.x, self.subject.y)]
-        checked = [(self.subject.x, self.subject.y)]
+        checked = set((self.subject.x, self.subject.y))
+
+        height = self.subject.board.height
+        length = self.subject.board.length
 
         while current_wave:
             next_wave = []
 
             for wave_coordinates in current_wave:
                 x, y = wave_coordinates
-                coordinates_to_check = []
-                coordinates_to_check.append((x + 1, y))
-                coordinates_to_check.append((x - 1, y))
-                coordinates_to_check.append((x, y + 1))
-                coordinates_to_check.append((x, y - 1))
+                coordinates_to_check = [(x + 1, y),
+                                        (x - 1, y),
+                                        (x, y + 1),
+                                        (x, y - 1)]
 
                 for coordinates in coordinates_to_check:
-                    if self.subject.board.coordinates_valid(coordinates[0], coordinates[1]) \
+                    if 0 <= coordinates[0] <= length-1 \
+                            and 0 <= coordinates[1] <= height-1 \
                             and (coordinates[0], coordinates[1]) not in checked:
 
                         cell = self.subject.board.get_cell(coordinates[0], coordinates[1])
@@ -339,7 +355,7 @@ class SearchMatingPartner(Action):
                                 self._partner = element
                                 return
 
-                        checked.append(coordinates)
+                        checked.add(coordinates)
                         if self.subject.board.cell_passable(coordinates[0], coordinates[1]):
                             next_wave.append(coordinates)
 

@@ -115,6 +115,7 @@ class Entity(object):
 
         return None
 
+
 class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
@@ -264,15 +265,16 @@ class Creature(Entity):
         return results
 
     def can_mate(self, with_who):
-        if isinstance(with_who, Creature) and with_who.sex != self.sex:
+        if isinstance(with_who, Creature):
+            if with_who.sex != self.sex:
 
-            if not self.alive or not with_who.alive:
-                return False
+                if not self.alive or not with_who.alive:
+                    return False
 
-            if self.sex:
-                return not with_who.has_state(states.Pregnant)
-            else:
-                return not self.has_state(states.Pregnant)
+                if self.sex:
+                    return not with_who.has_state(states.Pregnant)
+                else:
+                    return not self.has_state(states.Pregnant)
 
         return False
 

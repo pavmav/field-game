@@ -3,6 +3,18 @@
 from entities import *
 import pickle
 
+import cProfile
+
+def profile(func):
+    """Decorator for run function profile"""
+    def wrapper(*args, **kwargs):
+        profile_filename = func.__name__ + '.prof'
+        profiler = cProfile.Profile()
+        result = profiler.runcall(func, *args, **kwargs)
+        profiler.dump_stats(profile_filename)
+        return result
+    return wrapper
+
 
 class Field(object):
     def __init__(self, length, height):
@@ -98,6 +110,7 @@ class Field(object):
                     if entity_object in cell:
                         cell.remove(entity_object)
 
+    @profile
     def make_time(self):
         if self.pause:
             return
@@ -286,7 +299,7 @@ class Field(object):
         if x < 0 or y < 0:
             return False
 
-        if x >= self.length or y >= self.height:
+        if x >= self.__length or y >= self.__height:
             return False
 
         return True
