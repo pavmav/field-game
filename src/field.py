@@ -39,7 +39,7 @@ class Field(object):
     def height(self):
         return self.__height
 
-    def get_field(self):
+    def _get_field(self):
         return self.__field
 
     def get_cell(self, x, y):

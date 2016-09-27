@@ -115,7 +115,6 @@ class Entity(object):
 
         return None
 
-
 class Blank(Entity):
     def __init__(self):
         super(Blank, self).__init__()
@@ -210,22 +209,13 @@ class Creature(Entity):
 
         if self.sex:
 
-            list_creatures = self.board.find_all_entities_by_type(Creature)  # TODO rewrite wave search
+            find_partner = actions.SearchMatingPartner(self)
 
-            smallest_distance = 9e10
-            closest_so_far = None
+            search_results = find_partner.do_results()
 
-            for possible_partner in list_creatures:
-                if possible_partner == self or possible_partner.sex == self.sex or not possible_partner.can_mate(self):
-                    continue
-                distance = math.sqrt((self.x - possible_partner.x) ** 2 + (self.y - possible_partner.y) ** 2)
-                if distance <= smallest_distance:
-                    smallest_distance = distance
-                    closest_so_far = possible_partner
+            if search_results["accomplished"]:
+                fellow_creature = search_results["partner"]
 
-            fellow_creature = closest_so_far
-
-            if fellow_creature is not None:
                 follow = actions.MovementToEntity(self)
                 follow.set_objective(**{"target_entity": fellow_creature})
 
@@ -280,7 +270,7 @@ class Creature(Entity):
                 return False
 
             if self.sex:
-                return True
+                return not with_who.has_state(states.Pregnant)
             else:
                 return not self.has_state(states.Pregnant)
 

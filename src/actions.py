@@ -253,8 +253,6 @@ class SearchSubstance(Action):
         current_wave = [(self.subject.x, self.subject.y)]
         checked = [(self.subject.x, self.subject.y)]
 
-        # continue_search = True
-
         while current_wave:
             next_wave = []
 
@@ -280,6 +278,70 @@ class SearchSubstance(Action):
 
                         next_wave.append(coordinates)
                         checked.append(coordinates)
+
+            current_wave = next_wave[:]
+
+
+class SearchMatingPartner(Action):
+    def __init__(self, subject):
+        super(SearchMatingPartner, self).__init__(subject)
+
+        self.instant = True
+
+        self._partner = None
+
+    def do(self):
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        self.search()
+
+        self.check_set_results()
+        self._done = True
+
+    def check_set_results(self):
+        self.accomplished = self._partner is not None
+
+    @property
+    def results(self):
+        out = super(SearchMatingPartner, self).results
+
+        out["partner"] = self._partner
+
+        return out
+
+    def search(self):
+        current_wave = [(self.subject.x, self.subject.y)]
+        checked = [(self.subject.x, self.subject.y)]
+
+        while current_wave:
+            next_wave = []
+
+            for wave_coordinates in current_wave:
+                x, y = wave_coordinates
+                coordinates_to_check = []
+                coordinates_to_check.append((x + 1, y))
+                coordinates_to_check.append((x - 1, y))
+                coordinates_to_check.append((x, y + 1))
+                coordinates_to_check.append((x, y - 1))
+
+                for coordinates in coordinates_to_check:
+                    if self.subject.board.coordinates_valid(coordinates[0], coordinates[1]) \
+                            and (coordinates[0], coordinates[1]) not in checked:
+
+                        cell = self.subject.board.get_cell(coordinates[0], coordinates[1])
+
+                        for element in cell:
+                            if self.subject.can_mate(element):
+                                self._partner = element
+                                return
+
+                        checked.append(coordinates)
+                        if self.subject.board.cell_passable(coordinates[0], coordinates[1]):
+                            next_wave.append(coordinates)
 
             current_wave = next_wave[:]
 
