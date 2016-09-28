@@ -519,3 +519,67 @@ class GiveBirth(Action):
             cells_near.append((self.subject.x - 1, self.subject.y))
 
         return cells_near
+
+
+class HarvestSubstance(Action):
+    def __init__(self, subject):
+        super(HarvestSubstance, self).__init__(subject)
+
+        self._target_substance_type = None
+
+        self.search_action = SearchSubstance(subject)
+        self.move_action = MovementXY(subject)
+        self.extract_action = ExtractSubstanceXY(subject)
+
+        self.current_action = None
+
+    def get_objective(self):
+        out = {"target_substance_type": self._target_substance_type}
+
+        return out
+
+    def set_objective(self, control=False, **kwargs):
+        super(HarvestSubstance, self).set_objective(control, **kwargs)
+
+        self.search_action.set_objective(**{"target_substance_type": self._target_substance_type})
+
+        self.current_action = self.search_action
+
+    def action_possible(self):
+
+        if not self.current_action:
+            return False
+
+        return self.current_action.action_possible()
+
+    def do(self):
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        current_results = self.current_action.do_results()
+
+        if current_results["done"]:
+            if isinstance(self.current_action, SearchSubstance):
+                if current_results["accomplished"]:
+                    self.current_action = self.move_action
+                    self.current_action.set_objective(**{"target_x": current_results["substance_x"],
+                                                         "target_y": current_results["substance_y"]})
+                else:
+                    self._done = True
+            elif isinstance(self.current_action, MovementXY):
+                self.current_action = self.extract_action
+                self.current_action.set_objective(**{"substance_x": self.subject.x,
+                                                     "substance_y": self.subject.y,
+                                                     "substance_type": self._target_substance_type})
+            elif isinstance(self.current_action, ExtractSubstanceXY):
+                self._done = True
+
+    def check_set_results(self):
+        self.accomplished = self._done
+
+
+
+

@@ -228,27 +228,9 @@ class Creature(Entity):
 
                 return
 
-        find_substance = actions.SearchSubstance(self)
-        find_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-        search_results = find_substance.do_results()
-
-        if search_results["accomplished"]:
-            x, y = search_results["substance_x"], search_results["substance_y"]
-        else:
-            x = random.randint(1, self.board.length - 2)
-            y = random.randint(1, self.board.height - 2)
-
-        move = actions.MovementXY(self)
-        move.set_objective(**{"target_x": x, "target_y": y})
-
-        self.action_queue.append(move)
-
-        if search_results["accomplished"]:
-            extract_substance = actions.ExtractSubstanceXY(self)
-            extract_substance.set_objective(**{"substance_x": x,
-                                               "substance_y": y,
-                                               "substance_type": type(substances.Substance())})
-            self.action_queue.append(extract_substance)
+        harvest_substance = actions.HarvestSubstance(self)
+        harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+        self.action_queue.append(harvest_substance)
 
     def die(self):
         if not self.mortal:
