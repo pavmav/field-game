@@ -263,7 +263,7 @@ class SearchSubstance(Action):
 
     def search(self):
         current_wave = [(self.subject.x, self.subject.y)]
-        checked = set((self.subject.x, self.subject.y))
+        checked = {self.subject.x, self.subject.y}
 
         while current_wave:
             next_wave = []
@@ -327,7 +327,7 @@ class SearchMatingPartner(Action):
 
     def search(self):
         current_wave = [(self.subject.x, self.subject.y)]
-        checked = set((self.subject.x, self.subject.y))
+        checked = {self.subject.x, self.subject.y}
 
         height = self.subject.board.height
         length = self.subject.board.length
@@ -581,5 +581,45 @@ class HarvestSubstance(Action):
         self.accomplished = self._done
 
 
+class GoMating(Action):
+    def __init__(self, subject):
+        super(GoMating, self).__init__(subject)
+
+        self.search_action = SearchMatingPartner(subject)
+        self.move_action = MovementToEntity(subject)
+        self.mate_action = Mate(subject)
+
+        self.current_action = self.search_action
+
+    def action_possible(self):
+
+        if not self.current_action:
+            return False
+
+        return self.current_action.action_possible()
+
+    def do(self):
+        if self.results["done"]:
+            return
+
+        if not self.action_possible():
+            return
+
+        current_results = self.current_action.do_results()
+
+        if current_results["done"]:
+            if isinstance(self.current_action, SearchMatingPartner):  #  TODO instant search and mating
+                if current_results["accomplished"]:
+                    self.current_action = self.move_action
+                    self.current_action.set_objective(**{"target_entity": current_results["partner"]})
+                else:
+                    self._done = True
+            elif isinstance(self.current_action, MovementXY):
+                self.current_action = self.mate_action
+                self.current_action.set_objective(**{"target_entity": self.search_action.results["partner"]})
+            elif isinstance(self.current_action, Mate):
+                self._done = True
 
 
+    def check_set_results(self):
+        self.accomplished = self._done

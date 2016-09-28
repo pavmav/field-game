@@ -215,18 +215,9 @@ class Creature(Entity):
             search_results = find_partner.do_results()
 
             if search_results["accomplished"]:
-                fellow_creature = search_results["partner"]
+                go_mating = actions.GoMating(self)
 
-                follow = actions.MovementToEntity(self)
-                follow.set_objective(**{"target_entity": fellow_creature})
-
-                self.action_queue.append(follow)
-
-                mate = actions.Mate(self)
-                mate.set_objective(**{"target_entity": fellow_creature})
-                self.action_queue.append(mate)
-
-                return
+                self.action_queue.append(go_mating)
 
         harvest_substance = actions.HarvestSubstance(self)
         harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
