@@ -325,7 +325,6 @@ class SearchMatingPartner(Action):
 
         return out
 
-    @profile
     def search(self):
         current_wave = [(self.subject.x, self.subject.y)]
         checked = set((self.subject.x, self.subject.y))

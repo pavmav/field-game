@@ -2,6 +2,7 @@
 
 from entities import *
 import pickle
+import threading
 
 import cProfile
 
@@ -14,7 +15,6 @@ def profile(func):
         profiler.dump_stats(profile_filename)
         return result
     return wrapper
-
 
 class Field(object):
     def __init__(self, length, height):
@@ -110,7 +110,6 @@ class Field(object):
                     if entity_object in cell:
                         cell.remove(entity_object)
 
-    @profile
     def make_time(self):
         if self.pause:
             return
@@ -120,6 +119,32 @@ class Field(object):
                 for element in self.__field[y][x]:
                     if element.z == self.epoch:
                         element.live()
+
+        self.__epoch += 1
+
+    def _make_time(self):
+        if self.pause:
+            return
+
+        theads_list = []
+
+        for y in range(self.height):
+            for x in range(self.length):
+                for element in self.__field[y][x]:
+                    if element.z == self.epoch:
+                        theads_list.append(threading.Thread(target=element.live))
+
+        for t in theads_list:
+            t.start()
+
+        wait = True
+
+        while wait:
+            wait = False
+            for t in theads_list:
+                if t.isAlive():
+                    wait = True
+                    continue
 
         self.__epoch += 1
 

@@ -32,7 +32,6 @@ BACKGROUND_COLOR = "#004400"
 PLATFORM_WIDTH = 10
 PLATFORM_HEIGHT = 10
 
-@profile
 def main():
     pygame.init()  # Инициация PyGame, обязательная строчка
     screen = pygame.display.set_mode(DISPLAY)  # Создаем окошко
