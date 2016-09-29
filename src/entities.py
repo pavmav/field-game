@@ -258,7 +258,7 @@ class Creature(Entity):
         if self.sex:
             return True
         else:
-            return random.choice([True, False])
+            return random.choice([True])
 
 
 class BreedingGround(Entity):

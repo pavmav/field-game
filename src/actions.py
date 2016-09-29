@@ -559,23 +559,33 @@ class HarvestSubstance(Action):
         if not self.action_possible():
             return
 
-        current_results = self.current_action.do_results()
+        first = True
 
-        if current_results["done"]:
-            if isinstance(self.current_action, SearchSubstance):
+        while (first or (self.current_action and self.current_action.instant)):
+            first = False
+
+            current_results = self.current_action.do_results()
+
+            if current_results["done"]:
                 if current_results["accomplished"]:
-                    self.current_action = self.move_action
-                    self.current_action.set_objective(**{"target_x": current_results["substance_x"],
-                                                         "target_y": current_results["substance_y"]})
+                    if isinstance(self.current_action, SearchSubstance):
+                        self.current_action = self.move_action
+                        self.current_action.set_objective(**{"target_x": current_results["substance_x"],
+                                                             "target_y": current_results["substance_y"]})
+                    elif isinstance(self.current_action, MovementXY):
+                        self.current_action = self.extract_action
+                        self.current_action.set_objective(**{"substance_x": self.subject.x,
+                                                             "substance_y": self.subject.y,
+                                                             "substance_type": self._target_substance_type})
+                    elif isinstance(self.current_action, ExtractSubstanceXY):
+                        self.current_action = None
+                        self._done = True
                 else:
+                    self.current_action = None
                     self._done = True
-            elif isinstance(self.current_action, MovementXY):
-                self.current_action = self.extract_action
-                self.current_action.set_objective(**{"substance_x": self.subject.x,
-                                                     "substance_y": self.subject.y,
-                                                     "substance_type": self._target_substance_type})
-            elif isinstance(self.current_action, ExtractSubstanceXY):
-                self._done = True
+            else:
+                break
+
 
     def check_set_results(self):
         self.accomplished = self._done
@@ -605,20 +615,31 @@ class GoMating(Action):
         if not self.action_possible():
             return
 
-        current_results = self.current_action.do_results()
+        first = True
 
-        if current_results["done"]:
-            if isinstance(self.current_action, SearchMatingPartner):  #  TODO instant search and mating
+        while first or (self.current_action and self.current_action.instant) and not self.results["done"]:
+
+            first = False
+
+            current_results = self.current_action.do_results()
+
+            if current_results["done"]:
                 if current_results["accomplished"]:
-                    self.current_action = self.move_action
-                    self.current_action.set_objective(**{"target_entity": current_results["partner"]})
+                    if isinstance(self.current_action, SearchMatingPartner):  #  TODO instant search and mating
+                        if current_results["accomplished"]:
+                            self.current_action = self.move_action
+                            self.current_action.set_objective(**{"target_entity": current_results["partner"]})
+                    elif isinstance(self.current_action, MovementXY):
+                        self.current_action = self.mate_action
+                        self.current_action.set_objective(**{"target_entity": self.search_action.results["partner"]})
+                    elif isinstance(self.current_action, Mate):
+                        self.current_action = None
+                        self._done = True
                 else:
+                    self.current_action = None
                     self._done = True
-            elif isinstance(self.current_action, MovementXY):
-                self.current_action = self.mate_action
-                self.current_action.set_objective(**{"target_entity": self.search_action.results["partner"]})
-            elif isinstance(self.current_action, Mate):
-                self._done = True
+            else:
+                break
 
 
     def check_set_results(self):
