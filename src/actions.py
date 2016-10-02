@@ -460,6 +460,7 @@ class Mate(Action):
             return
 
         self._target_entity.add_state(states.Pregnant(self._target_entity))
+        self.subject.add_state(states.NotTheRightMood(self.subject))
 
         self._done = True
 
@@ -586,7 +587,6 @@ class HarvestSubstance(Action):
             else:
                 break
 
-
     def check_set_results(self):
         self.accomplished = self._done
 
@@ -609,6 +609,10 @@ class GoMating(Action):
         return self.current_action.action_possible()
 
     def do(self):
+        if self.subject.has_state(states.NotTheRightMood):
+            self._done = True
+            return
+
         if self.results["done"]:
             return
 
@@ -625,7 +629,7 @@ class GoMating(Action):
 
             if current_results["done"]:
                 if current_results["accomplished"]:
-                    if isinstance(self.current_action, SearchMatingPartner):  #  TODO instant search and mating
+                    if isinstance(self.current_action, SearchMatingPartner):
                         if current_results["accomplished"]:
                             self.current_action = self.move_action
                             self.current_action.set_objective(**{"target_entity": current_results["partner"]})
@@ -640,7 +644,6 @@ class GoMating(Action):
                     self._done = True
             else:
                 break
-
 
     def check_set_results(self):
         self.accomplished = self._done

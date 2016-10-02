@@ -52,7 +52,10 @@ def main():
     c = Creature()
     c.name = "John"
     g = Creature()
-    g.sex = not c.sex
+
+    c.set_sex(True)
+    c.add_state(states.NotTheRightMood(c))
+    g.set_sex(False)
 
     c.mortal = False
     g.mortal = False
@@ -109,10 +112,14 @@ def main():
                     tick -= 10
                 elif e.key == pygame.K_ESCAPE:
                     go_on = False
+                elif e.key == pygame.K_c:
+                    print c.count_substance_of_type(substances.Substance)
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">  TODO Нет первого состояния!
+        if f.epoch == 1000:
+            f.pause = True
         f.integrity_check()
         f.make_time()
         # f.save_pickle("__field.pickle")

@@ -115,6 +115,14 @@ class Entity(object):
 
         return None
 
+    def count_substance_of_type(self, type_of_substance):
+        num = 0
+        for element in self._container:
+            if isinstance(element, type_of_substance):
+                num += 1
+
+        return num
+
 
 class Blank(Entity):
     def __init__(self):
@@ -203,6 +211,14 @@ class Creature(Entity):
 
                 self.perform_action(current_action)
 
+    def set_sex(self, sex):
+        self.sex = sex
+        if self.sex:
+            self.color = "#550000"
+        else:
+            self.color = "#990000"
+
+
     def need_to_update_plan(self):
         return len(self.action_queue) == 0
 
@@ -218,6 +234,8 @@ class Creature(Entity):
                 go_mating = actions.GoMating(self)
 
                 self.action_queue.append(go_mating)
+
+                # return TODO Clever planning
 
         harvest_substance = actions.HarvestSubstance(self)
         harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
@@ -256,9 +274,16 @@ class Creature(Entity):
             return False
 
         if self.sex:
+            if self.has_state(states.NotTheRightMood):
+                return False
             return True
         else:
-            return random.choice([True])
+            self_has_substance = self.count_substance_of_type(substances.Substance)
+            partner_has_substance = with_who.count_substance_of_type(substances.Substance)
+            if self_has_substance <= partner_has_substance:
+                return True
+            else:
+                return random.random() < 1. * partner_has_substance / (self_has_substance + partner_has_substance)
 
 
 class BreedingGround(Entity):

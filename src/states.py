@@ -23,3 +23,14 @@ class Pregnant(State):
         if self.duration == self.timing:
             self.subject.action_queue.insert(0, actions.GiveBirth(self.subject, self))
 
+class NotTheRightMood(State):
+    def __init__(self, subject):
+        super(NotTheRightMood, self).__init__(subject)
+
+        self.timing = 10
+
+    def affect(self):
+        super(NotTheRightMood, self).affect()
+
+        if self.duration == self.timing:
+            self.subject.remove_state(self)
