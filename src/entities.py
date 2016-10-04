@@ -176,6 +176,11 @@ class Creature(Entity):
         else:
             self.color = "#990000"
         self.mortal = True
+        self.memory = []
+
+
+        #TODO
+        self.children = 0
 
     def __str__(self):
         return '@'
@@ -218,7 +223,6 @@ class Creature(Entity):
         else:
             self.color = "#990000"
 
-
     def need_to_update_plan(self):
         return len(self.action_queue) == 0
 
@@ -255,6 +259,20 @@ class Creature(Entity):
 
         return results
 
+    def perform_action_save_memory(self, action):
+        if isinstance(action, actions.GoMating):
+            current_num_children = self.children
+            features = {"age": float(self.age),
+                        "num_substance": float(self.count_substance_of_type(substances.Substance))}
+            results = self.perform_action(action)
+            if results["done"]:
+                features["success"] = results["accomplished"]
+                self.memory.append(features)
+            return results
+        else:
+            return self.perform_action(action)
+
+
     def can_mate(self, with_who):
         if isinstance(with_who, Creature):
             if with_who.sex != self.sex:
@@ -284,6 +302,9 @@ class Creature(Entity):
                 return True
             else:
                 return random.random() < 1. * partner_has_substance / (self_has_substance + partner_has_substance)
+
+    def update_memory(self, memory_row):
+        self.memory.append(memory_row)
 
 
 class BreedingGround(Entity):

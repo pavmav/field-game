@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+
+class LearningMemory(object):
+    def __init__(self, host):
+        self.host = host
+        self.memories = {}
+
+    def save_state(self, state, action):
+        self.memories[action] = {"state": state}
+
+    def save_results(self, results, action):
+        self.memories[action]["results"] = results["accomplished"]
+
+    def make_table(self, action_type):
+        table_list = []
+        for memory in self.memories:
+            if isinstance(memory, action_type):
+                row_dict = {}
+                for element in self.memories[memory]["state"]:
+                    row_dict[element] = self.memories[memory]["state"][element]
+                row_dict["target"] = self.memories[memory]["results"]
+                table_list.append(row_dict)
+
+        return table_list
+
+
+import unittest
+
+class TestLearningMemory(unittest.TestCase):
+
+    def setUp(self):
+        self.mem = LearningMemory(None)
+
+    def test_init(self):
+        self.assertTrue(self.mem.host is None)
+
+    def test_save_state(self):
+        self.mem.save_state({"foo": 1, "bar": 2}, 12)
+        self.mem.save_state({"foo": 6, "bar": 4}, 65)
+        self.mem.save_state({"spam": 1, "eggs": 2, "time": 55}, "42")
+
+        self.assertEqual(self.mem.memories, {12: {'state': {'foo': 1, 'bar': 2}},
+                                             65: {'state': {'foo': 6, 'bar': 4}},
+                                             "42": {'state': {"spam": 1, "eggs": 2, "time": 55}}})
+
+    def test_save_results(self):
+        self.mem.save_state({"foo": 1, "bar": 2}, 12)
+        self.mem.save_state({"foo": 6, "bar": 4}, 65)
+        self.mem.save_state({"spam": 1, "eggs": 2, "time": 55}, "42")
+
+        results = {"done": True, "accomplished": False}
+
+        self.mem.save_results(results, 65)
+
+        self.assertEqual(self.mem.memories, {12: {'state': {'foo': 1, 'bar': 2}},
+                                             65: {'state': {'foo': 6, 'bar': 4},
+                                                  'results': False},
+                                             "42": {'state': {"spam": 1, "eggs": 2, "time": 55}}})
+
+    def test_make_table(self):
+        self.mem.save_state({"foo": 1, "bar": 2}, 12)
+        self.mem.save_state({"foo": 6, "bar": 4}, 65)
+        self.mem.save_state({"spam": 1, "eggs": 2, "time": 55}, "42")
+        results = {"done": True, "accomplished": False}
+        self.mem.save_results(results, 65)
+        results = {"done": True, "accomplished": True}
+        self.mem.save_results(results, 12)
+
+        self.assertEqual(self.mem.make_table(int), [{'foo': 6, 'bar': 4, 'target': False},
+                                                    {'foo': 1, 'bar': 2, 'target': True}])
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+# create task ?
+# save state when planning
+# save result when done
