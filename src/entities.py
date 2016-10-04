@@ -5,6 +5,7 @@ import actions
 import substances
 import math
 import states
+import brain
 
 
 class Entity(object):
@@ -176,7 +177,7 @@ class Creature(Entity):
         else:
             self.color = "#990000"
         self.mortal = True
-        self.memory = []
+        self.learning_memory = brain.LearningMemory(self)
 
 
         #TODO
@@ -209,12 +210,12 @@ class Creature(Entity):
 
             current_action = self.action_queue[0]
 
-            self.perform_action(current_action)
+            self.perform_action_save_memory(current_action)
 
             while len(self.action_queue) > 0 and self.action_queue[0].instant:
                 current_action = self.action_queue[0]
 
-                self.perform_action(current_action)
+                self.perform_action_save_memory(current_action)
 
     def set_sex(self, sex):
         self.sex = sex
@@ -237,13 +238,13 @@ class Creature(Entity):
             if search_results["accomplished"]:
                 go_mating = actions.GoMating(self)
 
-                self.action_queue.append(go_mating)
+                self.queue_action(go_mating)
 
                 # return TODO Clever planning
 
         harvest_substance = actions.HarvestSubstance(self)
         harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-        self.action_queue.append(harvest_substance)
+        self.queue_action(harvest_substance)
 
     def die(self):
         if not self.mortal:
@@ -261,17 +262,20 @@ class Creature(Entity):
 
     def perform_action_save_memory(self, action):
         if isinstance(action, actions.GoMating):
-            current_num_children = self.children
-            features = {"age": float(self.age),
-                        "num_substance": float(self.count_substance_of_type(substances.Substance))}
             results = self.perform_action(action)
             if results["done"]:
-                features["success"] = results["accomplished"]
-                self.memory.append(features)
+                self.learning_memory.save_results(results, action)
             return results
         else:
             return self.perform_action(action)
 
+    def queue_action(self, action):
+        if isinstance(action, actions.GoMating):
+            features = {"age": float(self.age),
+                        "num_substance": float(self.count_substance_of_type(substances.Substance))}
+            self.learning_memory.save_state(features, action)
+
+        self.action_queue.append(action)
 
     def can_mate(self, with_who):
         if isinstance(with_who, Creature):
@@ -303,8 +307,6 @@ class Creature(Entity):
             else:
                 return random.random() < 1. * partner_has_substance / (self_has_substance + partner_has_substance)
 
-    def update_memory(self, memory_row):
-        self.memory.append(memory_row)
 
 
 class BreedingGround(Entity):

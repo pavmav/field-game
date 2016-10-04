@@ -15,6 +15,8 @@ class LearningMemory(object):
         table_list = []
         for memory in self.memories:
             if isinstance(memory, action_type):
+                if "state" not in self.memories[memory] or "results" not in self.memories[memory]:
+                    continue
                 row_dict = {}
                 for element in self.memories[memory]["state"]:
                     row_dict[element] = self.memories[memory]["state"][element]

@@ -114,12 +114,18 @@ def main():
                     go_on = False
                 elif e.key == pygame.K_c:
                     print c.count_substance_of_type(substances.Substance)
+                elif e.key == pygame.K_m:
+                    l = c.learning_memory.make_table(actions.GoMating)
+                    print "/n"
+                    for line in l:
+                        print line
+                    # print c.learning_memory.memories
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
         # <editor-fold desc="Field">  TODO Нет первого состояния!
-        if f.epoch == 1000:
-            f.pause = True
+        # if f.epoch == 1000:
+        #     f.pause = True
         f.integrity_check()
         f.make_time()
         # f.save_pickle("__field.pickle")
