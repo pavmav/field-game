@@ -9,6 +9,7 @@ import tkFileDialog
 # <editor-fold desc="Field">
 from field import *
 import field
+import entities
 
 # </editor-fold>
 
@@ -48,24 +49,26 @@ def main():
     # <editor-fold desc="Field">
     f = Field(60, 40)
 
-    b = Block()
-    c = Creature()
-    c.name = "John"
-    g = Creature()
+    # b = Block()
+    # c = Creature()
+    # c.name = "John"
+    # g = Creature()
+    #
+    # c.set_sex(True)
+    # c.add_state(states.NotTheRightMood(c))
+    # g.set_sex(False)
+    #
+    # c.mortal = False
+    # g.mortal = False
 
-    c.set_sex(True)
-    c.add_state(states.NotTheRightMood(c))
-    g.set_sex(False)
-
-    c.mortal = False
-    g.mortal = False
-
-    brg = BreedingGround()
-
-    f.insert_object(5, 2, c)
-    f.insert_object(30, 20, g)
-    f.insert_object(3, 4, b)
+    # brg = BreedingGround()
+    #
+    # f.insert_object(5, 2, c)
+    # f.insert_object(30, 20, g)
+    # f.insert_object(3, 4, b)
     # f.insert_object(10, 15, brg)
+
+    f.populate(entities.Creature, 20)
 
     for y in range(10, 30):
         f.insert_object(20, y, Block())
@@ -112,14 +115,17 @@ def main():
                     tick -= 10
                 elif e.key == pygame.K_ESCAPE:
                     go_on = False
-                elif e.key == pygame.K_c:
-                    print c.count_substance_of_type(substances.Substance)
-                elif e.key == pygame.K_m:
-                    l = c.learning_memory.make_table(actions.GoMating)
-                    print "/n"
-                    for line in l:
+                # elif e.key == pygame.K_c:
+                #     print c.count_substance_of_type(substances.Substance)
+                # elif e.key == pygame.K_m:
+                #     l = c.learning_memory.make_table(actions.GoMating)
+                #     print "/n"
+                #     for line in l:
+                #         print line
+                elif e.key == pygame.K_g:
+                    table_list_of_dicts = f.public_memory.make_table(actions.GoMating)
+                    for line in table_list_of_dicts:
                         print line
-                    # print c.learning_memory.memories
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 

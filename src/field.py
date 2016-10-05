@@ -3,6 +3,8 @@
 from entities import *
 import pickle
 import threading
+import brain
+import entities
 
 import cProfile
 
@@ -23,6 +25,7 @@ class Field(object):
         self.__field = []
         self.__epoch = 0
         self.pause = False
+        self.public_memory = brain.LearningMemory(self)
 
         for y in range(self.__height):
             row = []
@@ -99,6 +102,9 @@ class Field(object):
         entity_object.board = self
         entity_object.x = x
         entity_object.y = y
+
+        if isinstance(entity_object, entities.Creature):
+            entity_object.public_memory = self.public_memory
 
     def remove_object(self, entity_object, x=None, y=None):
         if x is not None and y is not None:
@@ -328,6 +334,16 @@ class Field(object):
             return False
 
         return True
+
+    def populate(self, entity_type, number):
+        for i in range(number):
+            x = random.randint(0, self.length-1)
+            y = random.randint(0, self.height-1)
+
+            if self.cell_passable(x, y):
+                self.insert_object(x, y, entity_type())
+            else:
+                i -=1
 
 
 def load_from_pickle(filename):

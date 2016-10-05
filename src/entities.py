@@ -141,7 +141,7 @@ class Blank(Entity):
     def live(self):
         super(Blank, self).live()
 
-        if random.random() <= 0.0002:
+        if random.random() <= 0.0004:
             self._container.append(substances.Substance())
 
         if len(self._container) > 0:
@@ -177,7 +177,8 @@ class Creature(Entity):
         else:
             self.color = "#990000"
         self.mortal = True
-        self.learning_memory = brain.LearningMemory(self)
+        self.private_learning_memory = brain.LearningMemory(self)
+        self.public_memory = None
 
 
         #TODO
@@ -263,8 +264,10 @@ class Creature(Entity):
     def perform_action_save_memory(self, action):
         if isinstance(action, actions.GoMating):
             results = self.perform_action(action)
+            mating_results = action.mate_action.results
             if results["done"]:
-                self.learning_memory.save_results(results, action)
+                self.private_learning_memory.save_results(mating_results, action)
+                self.public_memory.save_results(mating_results, action)
             return results
         else:
             return self.perform_action(action)
@@ -273,7 +276,8 @@ class Creature(Entity):
         if isinstance(action, actions.GoMating):
             features = {"age": float(self.age),
                         "num_substance": float(self.count_substance_of_type(substances.Substance))}
-            self.learning_memory.save_state(features, action)
+            self.private_learning_memory.save_state(features, action)
+            self.public_memory.save_state(features, action)
 
         self.action_queue.append(action)
 
@@ -306,7 +310,6 @@ class Creature(Entity):
                 return True
             else:
                 return random.random() < 1. * partner_has_substance / (self_has_substance + partner_has_substance)
-
 
 
 class BreedingGround(Entity):
