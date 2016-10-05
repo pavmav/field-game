@@ -10,6 +10,7 @@ import tkFileDialog
 from field import *
 import field
 import entities
+import pandas
 
 # </editor-fold>
 
@@ -124,8 +125,8 @@ def main():
                 #         print line
                 elif e.key == pygame.K_g:
                     table_list_of_dicts = f.public_memory.make_table(actions.GoMating)
-                    for line in table_list_of_dicts:
-                        print line
+                    df = pandas.DataFrame.from_dict(*[table_list_of_dicts])
+                    print df
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 
