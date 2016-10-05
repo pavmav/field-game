@@ -9,7 +9,10 @@ class LearningMemory(object):
         self.memories[action] = {"state": state}
 
     def save_results(self, results, action):
-        self.memories[action]["results"] = results["accomplished"]
+        if action in self.memories:
+            self.memories[action]["results"] = results["accomplished"]
+        else:
+            raise ValueError
 
     def make_table(self, action_type):
         table_list = []
@@ -58,6 +61,10 @@ class TestLearningMemory(unittest.TestCase):
                                              65: {'state': {'foo': 6, 'bar': 4},
                                                   'results': False},
                                              "42": {'state': {"spam": 1, "eggs": 2, "time": 55}}})
+
+        self.assertRaises(ValueError, self.mem.save_results, **{"results": results,
+                                                                "action": 88})
+
 
     def test_make_table(self):
         self.mem.save_state({"foo": 1, "bar": 2}, 12)
