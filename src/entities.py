@@ -180,8 +180,7 @@ class Creature(Entity):
         self.private_learning_memory = brain.LearningMemory(self)
         self.public_memory = None
 
-
-        #TODO
+        # TODO
         self.children = 0
 
     def __str__(self):

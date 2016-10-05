@@ -8,15 +8,19 @@ import entities
 
 import cProfile
 
+
 def profile(func):
     """Decorator for run function profile"""
+
     def wrapper(*args, **kwargs):
         profile_filename = func.__name__ + '.prof'
         profiler = cProfile.Profile()
         result = profiler.runcall(func, *args, **kwargs)
         profiler.dump_stats(profile_filename)
         return result
+
     return wrapper
+
 
 class Field(object):
     def __init__(self, length, height):
@@ -337,13 +341,13 @@ class Field(object):
 
     def populate(self, entity_type, number):
         for i in range(number):
-            x = random.randint(0, self.length-1)
-            y = random.randint(0, self.height-1)
+            x = random.randint(0, self.length - 1)
+            y = random.randint(0, self.height - 1)
 
             if self.cell_passable(x, y):
                 self.insert_object(x, y, entity_type())
             else:
-                i -=1
+                i -= 1
 
 
 def load_from_pickle(filename):

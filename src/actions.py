@@ -270,11 +270,7 @@ class SearchSubstance(Action):
 
             for wave_coordinates in current_wave:
                 x, y = wave_coordinates
-                coordinates_to_check = []
-                coordinates_to_check.append((x + 1, y))
-                coordinates_to_check.append((x - 1, y))
-                coordinates_to_check.append((x, y + 1))
-                coordinates_to_check.append((x, y - 1))
+                coordinates_to_check = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
 
                 for coordinates in coordinates_to_check:
                     if self.subject.board.coordinates_valid(coordinates[0], coordinates[1]) \
@@ -565,7 +561,7 @@ class HarvestSubstance(Action):
 
         first = True
 
-        while (first or (self.current_action and self.current_action.instant)):
+        while first or (self.current_action and self.current_action.instant):
             first = False
 
             current_results = self.current_action.do_results()

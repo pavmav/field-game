@@ -31,8 +31,8 @@ class LearningMemory(object):
 
 import unittest
 
-class TestLearningMemory(unittest.TestCase):
 
+class TestLearningMemory(unittest.TestCase):
     def setUp(self):
         self.mem = LearningMemory(None)
 
@@ -65,7 +65,6 @@ class TestLearningMemory(unittest.TestCase):
         self.assertRaises(ValueError, self.mem.save_results, **{"results": results,
                                                                 "action": 88})
 
-
     def test_make_table(self):
         self.mem.save_state({"foo": 1, "bar": 2}, 12)
         self.mem.save_state({"foo": 6, "bar": 4}, 65)
@@ -78,10 +77,11 @@ class TestLearningMemory(unittest.TestCase):
         self.assertEqual(self.mem.make_table(int), [{'foo': 6, 'bar': 4, 'target': False},
                                                     {'foo': 1, 'bar': 2, 'target': True}])
 
+
 if __name__ == '__main__':
     unittest.main()
 
 
-# create task ?
-# save state when planning
-# save result when done
+    # create task ?
+    # save state when planning
+    # save result when done
