@@ -263,10 +263,9 @@ class Creature(Entity):
     def perform_action_save_memory(self, action):
         if isinstance(action, actions.GoMating):
             results = self.perform_action(action)
-            mating_results = action.mate_action.results
             if results["done"]:
-                self.private_learning_memory.save_results(mating_results, action)
-                self.public_memory.save_results(mating_results, action)
+                self.private_learning_memory.save_results(results, action)
+                self.public_memory.save_results(results, action)
             return results
         else:
             return self.perform_action(action)
@@ -305,6 +304,8 @@ class Creature(Entity):
         else:
             self_has_substance = self.count_substance_of_type(substances.Substance)
             partner_has_substance = with_who.count_substance_of_type(substances.Substance)
+            if self_has_substance + partner_has_substance == 0:
+                return False
             if self_has_substance <= partner_has_substance:
                 return True
             else:

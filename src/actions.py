@@ -637,6 +637,7 @@ class GoMating(Action):
                         self.current_action.set_objective(**{"target_entity": self.search_action.results["partner"]})
                     elif isinstance(self.current_action, Mate):
                         self.current_action = None
+                        self.accomplished = True
                         self._done = True
                 else:
                     self.current_action = None
