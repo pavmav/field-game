@@ -616,6 +616,7 @@ class GoMating(Action):
             return
 
         if not self.action_possible():
+            self._done = True
             return
 
         first = True

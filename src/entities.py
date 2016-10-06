@@ -273,7 +273,12 @@ class Creature(Entity):
     def queue_action(self, action):
         if isinstance(action, actions.GoMating):
             features = {"age": float(self.age),
-                        "num_substance": float(self.count_substance_of_type(substances.Substance))}
+                        "self_num_substance": float(self.count_substance_of_type(substances.Substance)),
+                        "partner_num_substance": float(
+                            actions.SearchMatingPartner(self).do_results()["partner"].count_substance_of_type(
+                                substances.Substance)),
+                        "not_in_mood": float(self.has_state(states.NotTheRightMood))}
+
             self.private_learning_memory.save_state(features, action)
             self.public_memory.save_state(features, action)
 
@@ -309,7 +314,7 @@ class Creature(Entity):
             if self_has_substance <= partner_has_substance:
                 return True
             else:
-                return random.random() < 1. * partner_has_substance / (self_has_substance + partner_has_substance)
+                return random.random() < 1. * partner_has_substance / (self_has_substance*3 + partner_has_substance)
 
 
 class BreedingGround(Entity):
