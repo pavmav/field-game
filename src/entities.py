@@ -6,6 +6,8 @@ import substances
 import math
 import states
 import brain
+from sklearn.externals import joblib
+import numpy as np
 
 
 class Entity(object):
@@ -180,6 +182,8 @@ class Creature(Entity):
         self.private_learning_memory = brain.LearningMemory(self)
         self.public_memory = None
 
+        self.decision_model = joblib.load("mating_model/dt_model")
+
         # TODO
         self.children = 0
 
@@ -199,7 +203,7 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        if random.random() <= 0.005 and self.age > 10:
+        if random.random() <= 0.0005 and self.age > 10:
             self.die()
             return
 
@@ -236,9 +240,27 @@ class Creature(Entity):
             search_results = find_partner.do_results()
 
             if search_results["accomplished"]:
-                go_mating = actions.GoMating(self)
 
-                self.queue_action(go_mating)
+                features = [float(self.age),
+                            float(self.has_state(states.NotTheRightMood)),
+                            float(actions.SearchMatingPartner(self).do_results()["partner"].count_substance_of_type(
+                                    substances.Substance)),
+                            float(self.count_substance_of_type(substances.Substance))]
+
+                features = np.asarray(features)
+
+                features = features.reshape(1, -1)
+
+                if self.decision_model.predict(features):
+                    go_mating = actions.GoMating(self)
+                    self.queue_action(go_mating)
+                    return
+                else:
+                    harvest_substance = actions.HarvestSubstance(self)
+                    harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+                    self.queue_action(harvest_substance)
+                    return
+
 
                 # return TODO Clever planning
 

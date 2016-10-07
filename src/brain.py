@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import unittest
+
 
 class LearningMemory(object):
     def __init__(self, host):
@@ -27,9 +29,6 @@ class LearningMemory(object):
                 table_list.append(row_dict)
 
         return table_list
-
-
-import unittest
 
 
 class TestLearningMemory(unittest.TestCase):
