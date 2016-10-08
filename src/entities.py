@@ -8,6 +8,7 @@ import states
 import brain
 from sklearn.externals import joblib
 import numpy as np
+import pandas
 
 
 class Entity(object):
@@ -203,7 +204,7 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        if random.random() <= 0.0005 and self.age > 10:
+        if random.random() <= 0.005 and self.age > 10:
             self.die()
             return
 
@@ -220,6 +221,9 @@ class Creature(Entity):
                 current_action = self.action_queue[0]
 
                 self.perform_action_save_memory(current_action)
+
+        # if self.age % 40 == 0:
+        self.update_decision_model()
 
     def set_sex(self, sex):
         self.sex = sex
@@ -338,6 +342,16 @@ class Creature(Entity):
             else:
                 return random.random() < 1. * partner_has_substance / (self_has_substance*3 + partner_has_substance)
 
+    def update_decision_model(self):
+        table_list_of_dicts = self.private_learning_memory.make_table(actions.GoMating)
+        df_train = pandas.DataFrame.from_dict(*[table_list_of_dicts])
+        if len(df_train) > 5:
+            # df_train.drop(df_train.columns[0], axis=1, inplace=True)
+            y_train = df_train.pop('target')
+            X_train = df_train
+            # print X_train
+            self.decision_model.fit(X_train, y_train)
+            self.private_learning_memory = brain.LearningMemory(self)
 
 class BreedingGround(Entity):
     def __init__(self):

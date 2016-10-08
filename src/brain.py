@@ -14,7 +14,7 @@ class LearningMemory(object):
         if action in self.memories:
             self.memories[action]["results"] = results["accomplished"]
         else:
-            raise ValueError
+            pass
 
     def make_table(self, action_type):
         table_list = []
