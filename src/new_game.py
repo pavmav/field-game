@@ -10,7 +10,7 @@ import tkFileDialog
 from field import *
 import field
 import entities
-import pandas
+import numpy as np
 
 # </editor-fold>
 
@@ -67,7 +67,7 @@ def main():
     # f.insert_object(5, 2, c)
     # f.insert_object(30, 20, g)
     # f.insert_object(3, 4, b)
-    f.insert_object(10, 15, brg)
+    # f.insert_object(10, 15, brg)
 
     f.populate(entities.Creature, 20)
 
@@ -125,12 +125,7 @@ def main():
                 #         print line
                 elif e.key == pygame.K_g:
                     table_list_of_dicts = f.public_memory.make_table(actions.GoMating)
-                    df = pandas.DataFrame.from_dict(*[table_list_of_dicts])
-                    # root = tk.Tk()
-                    # root.withdraw()
-                    # file_path = tkFileDialog.asksaveasfilename()
-                    # df.to_csv(file_path)
-                    print df
+                    print table_list_of_dicts
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
 

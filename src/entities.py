@@ -10,6 +10,10 @@ from sklearn.externals import joblib
 import numpy as np
 import pandas
 
+# TODO
+def nearest_partner_has_substance(entity):
+    return float(actions.SearchMatingPartner(entity).do_results()["partner"].count_substance_of_type(substances.Substance))
+
 
 class Entity(object):
     def __init__(self):
@@ -189,18 +193,19 @@ class Creature(Entity):
         self.chosen_action = None
 
         # TODO
-        self.set_memorize_task(actions.HarvestSubstance,
-                               [{"func": lambda self: self.age,
-                                 "kwargs": {"self": self}},
-                                "hh",
-                                self.class_name,
-                                {"func": self.will_mate,
-                                 "kwargs": {"with_who": 8}}],
-                               {"func": lambda self: self.chosen_action.results["accomplished"],
-                                "kwargs": {"self": self}})
+        if self.sex:
+            features = [{"func": lambda self: float(self.age),
+                         "kwargs": {"self": self}},
+                        {"func": lambda self: float(self.has_state(states.NotTheRightMood)),
+                         "kwargs": {"self": self}},
+                        {"func": nearest_partner_has_substance,
+                         "kwargs": {"entity": self}},
+                        {"func": lambda self: float(self.count_substance_of_type(substances.Substance)),
+                         "kwargs": {"self": self}}]
 
-        # TODO
-        self.children = 0
+            self.set_memorize_task(actions.GoMating, features,
+                                   {"func": lambda self: self.chosen_action.results["accomplished"],
+                                    "kwargs": {"self": self}})
 
     def __str__(self):
         return '@'
@@ -218,7 +223,7 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        if random.random() <= 0.005 and self.age > 10:
+        if random.random() <= 0.0005 and self.age > 10:
             self.die()
             return
 
@@ -236,7 +241,6 @@ class Creature(Entity):
 
                 self.perform_action_save_memory(current_action)
 
-        # if self.age % 40 == 0:
         self.update_decision_model()
 
     def set_sex(self, sex):
@@ -259,11 +263,7 @@ class Creature(Entity):
 
             if search_results["accomplished"]:
 
-                features = [float(self.age),
-                            float(self.has_state(states.NotTheRightMood)),
-                            float(actions.SearchMatingPartner(self).do_results()["partner"].count_substance_of_type(
-                                    substances.Substance)),
-                            float(self.count_substance_of_type(substances.Substance))]
+                features = self.get_features(actions.GoMating)
 
                 features = np.asarray(features)
 
@@ -300,36 +300,22 @@ class Creature(Entity):
     def perform_action_save_memory(self, action):
         self.chosen_action = action
 
-        if isinstance(action, actions.GoMating):
+        if type(action) in self.memorize_tasks:
             results = self.perform_action(action)
             if results["done"]:
-                self.private_learning_memory.save_results(results, action)
-                self.public_memory.save_results(results, action)
+                self.private_learning_memory.save_results(self.get_target(type(action)), action)
+                self.public_memory.save_results(self.get_target(type(action)), action)
         else:
             results = self.perform_action(action)
-
-        # TODO
-        if type(action) in self.memorize_tasks:
-            print self.get_target(type(action))
 
         self.chosen_action = None
         return results
 
     def queue_action(self, action):
-        # TODO
+
         if type(action) in self.memorize_tasks:
-            print self.get_features(type(action))
-
-        if isinstance(action, actions.GoMating):
-            features = [float(self.age),
-                        float(self.has_state(states.NotTheRightMood)),
-                        float(
-                            actions.SearchMatingPartner(self).do_results()["partner"].count_substance_of_type(
-                                substances.Substance)),
-                        float(self.count_substance_of_type(substances.Substance))]
-
-            self.private_learning_memory.save_state(features, action)
-            self.public_memory.save_state(features, action)
+            self.private_learning_memory.save_state(self.get_features(type(action)), action)
+            self.public_memory.save_state(self.get_features(type(action)), action)
 
         self.action_queue.append(action)
 

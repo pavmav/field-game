@@ -458,9 +458,6 @@ class Mate(Action):
         self._target_entity.add_state(states.Pregnant(self._target_entity))
         self.subject.add_state(states.NotTheRightMood(self.subject))
 
-        # TODO
-        self.subject.children += 1
-
         self._done = True
 
         self.check_set_results()

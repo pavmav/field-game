@@ -12,7 +12,7 @@ class LearningMemory(object):
 
     def save_results(self, results, action):
         if action in self.memories:
-            self.memories[action]["results"] = results["accomplished"]
+            self.memories[action]["results"] = results
         else:
             pass
 
