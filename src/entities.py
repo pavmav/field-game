@@ -187,7 +187,8 @@ class Creature(Entity):
         self.private_learning_memory = brain.LearningMemory(self)
         self.public_memory = None
 
-        self.decision_model = joblib.load("mating_model/dt_model")
+        self.private_decision_model = joblib.load("mating_model/dt_model")
+        self.public_decision_model = None
 
         self.memorize_tasks = {}
         self.chosen_action = None
@@ -269,7 +270,7 @@ class Creature(Entity):
 
                 features = features.reshape(1, -1)
 
-                if self.decision_model.predict(features):
+                if self.public_decision_model.predict(features):
                     go_mating = actions.GoMating(self)
                     self.queue_action(go_mating)
                     return
@@ -353,11 +354,11 @@ class Creature(Entity):
 
     def update_decision_model(self):
         table_list = self.private_learning_memory.make_table(actions.GoMating)
-        if len(table_list) > 2:
+        if len(table_list) > 5:
             df_train = pandas.DataFrame(table_list)
             y_train = df_train.pop(4)
             X_train = df_train
-            self.decision_model.fit(X_train, y_train)
+            self.public_decision_model.fit(X_train, y_train)
             self.private_learning_memory = brain.LearningMemory(self)
             print "UPDATE SUCCESSFULL"
 

@@ -5,6 +5,7 @@ import pickle
 import threading
 import brain
 import entities
+from sklearn.externals import joblib
 
 import cProfile
 
@@ -30,6 +31,7 @@ class Field(object):
         self.__epoch = 0
         self.pause = False
         self.public_memory = brain.LearningMemory(self)
+        self.public_decision_model = joblib.load("mating_model/dt_model")
 
         for y in range(self.__height):
             row = []
@@ -109,6 +111,7 @@ class Field(object):
 
         if isinstance(entity_object, entities.Creature):
             entity_object.public_memory = self.public_memory
+            entity_object.public_decision_model = self.public_decision_model
 
     def remove_object(self, entity_object, x=None, y=None):
         if x is not None and y is not None:
