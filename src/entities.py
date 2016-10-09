@@ -185,6 +185,18 @@ class Creature(Entity):
 
         self.decision_model = joblib.load("mating_model/dt_model")
 
+        self.memorize_tasks = {}
+
+        # TODO
+        self.set_memorize_task(actions.HarvestSubstance,
+                               [{"func": lambda self: self.age,
+                                 "kwargs": {"self": self}},
+                                "hh",
+                                self.class_name,
+                                {"func": self.will_mate,
+                                 "kwargs": {"with_who": 8}}],
+                               "hh")
+
         # TODO
         self.children = 0
 
@@ -264,13 +276,10 @@ class Creature(Entity):
                     harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
                     self.queue_action(harvest_substance)
                     return
-
-
-                # return TODO Clever planning
-
-        harvest_substance = actions.HarvestSubstance(self)
-        harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-        self.queue_action(harvest_substance)
+        else:
+            harvest_substance = actions.HarvestSubstance(self)
+            harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+            self.queue_action(harvest_substance)
 
     def die(self):
         if not self.mortal:
@@ -292,11 +301,20 @@ class Creature(Entity):
             if results["done"]:
                 self.private_learning_memory.save_results(results, action)
                 self.public_memory.save_results(results, action)
-            return results
         else:
-            return self.perform_action(action)
+            results = self.perform_action(action)
+
+        # TODO
+        if type(action) in self.memorize_tasks:
+            print self.get_target(type(action))
+
+        return results
 
     def queue_action(self, action):
+        # TODO
+        if type(action) in self.memorize_tasks:
+            print self.get_features(type(action))
+
         if isinstance(action, actions.GoMating):
             features = {"age": float(self.age),
                         "self_num_substance": float(self.count_substance_of_type(substances.Substance)),
@@ -344,14 +362,60 @@ class Creature(Entity):
 
     def update_decision_model(self):
         table_list_of_dicts = self.private_learning_memory.make_table(actions.GoMating)
-        df_train = pandas.DataFrame.from_dict(*[table_list_of_dicts])
-        if len(df_train) > 5:
+        if len(table_list_of_dicts) > 5:
+            df_train = pandas.DataFrame.from_dict(*[table_list_of_dicts])
             # df_train.drop(df_train.columns[0], axis=1, inplace=True)
             y_train = df_train.pop('target')
             X_train = df_train
             # print X_train
             self.decision_model.fit(X_train, y_train)
             self.private_learning_memory = brain.LearningMemory(self)
+
+    def set_memorize_task(self, action_types, features_list, target):
+        if isinstance(action_types, list):
+            for action_type in action_types:
+                self.memorize_tasks[action_type] = {"features": features_list,
+                                                    "target": target}
+        else:
+            self.memorize_tasks[action_types] = {"features": features_list,
+                                                 "target": target}
+
+    def get_features(self, action_type):
+        if not action_type in self.memorize_tasks:
+            return None
+
+        features_list_raw = self.memorize_tasks[action_type]["features"]
+        features_list = []
+
+        for feature_raw in features_list_raw:
+            if isinstance(feature_raw, dict):
+                if "kwargs" in feature_raw:
+                    features_list.append(feature_raw["func"](**feature_raw["kwargs"]))
+                else:
+                    features_list.append(feature_raw["func"]())
+            elif callable(feature_raw):
+                features_list.append(feature_raw())
+            else:
+                features_list.append(feature_raw)
+
+        return features_list
+
+    def get_target(self, action_type):
+        if not action_type in self.memorize_tasks:
+            return None
+
+        target_raw = self.memorize_tasks[action_type]["target"]
+
+        if callable(target_raw):
+            return target_raw()
+        elif isinstance(target_raw, dict):
+            if "kwargs" in target_raw:
+                return target_raw["func"](**target_raw["kwargs"])
+            else:
+                return target_raw["func"]()
+        else:
+            return target_raw
+
 
 class BreedingGround(Entity):
     def __init__(self):

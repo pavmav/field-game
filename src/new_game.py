@@ -126,10 +126,10 @@ def main():
                 elif e.key == pygame.K_g:
                     table_list_of_dicts = f.public_memory.make_table(actions.GoMating)
                     df = pandas.DataFrame.from_dict(*[table_list_of_dicts])
-                    root = tk.Tk()
-                    root.withdraw()
-                    file_path = tkFileDialog.asksaveasfilename()
-                    df.to_csv(file_path)
+                    # root = tk.Tk()
+                    # root.withdraw()
+                    # file_path = tkFileDialog.asksaveasfilename()
+                    # df.to_csv(file_path)
                     print df
 
         screen.blit(bg, (0, 0))  # Каждую итерацию необходимо всё перерисовывать
