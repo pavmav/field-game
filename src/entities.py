@@ -186,6 +186,7 @@ class Creature(Entity):
         self.decision_model = joblib.load("mating_model/dt_model")
 
         self.memorize_tasks = {}
+        self.chosen_action = None
 
         # TODO
         self.set_memorize_task(actions.HarvestSubstance,
@@ -195,7 +196,8 @@ class Creature(Entity):
                                 self.class_name,
                                 {"func": self.will_mate,
                                  "kwargs": {"with_who": 8}}],
-                               "hh")
+                               {"func": lambda self: self.chosen_action.results["accomplished"],
+                                "kwargs": {"self": self}})
 
         # TODO
         self.children = 0
@@ -296,6 +298,8 @@ class Creature(Entity):
         return results
 
     def perform_action_save_memory(self, action):
+        self.chosen_action = action
+
         if isinstance(action, actions.GoMating):
             results = self.perform_action(action)
             if results["done"]:
@@ -308,6 +312,7 @@ class Creature(Entity):
         if type(action) in self.memorize_tasks:
             print self.get_target(type(action))
 
+        self.chosen_action = None
         return results
 
     def queue_action(self, action):
@@ -316,12 +321,12 @@ class Creature(Entity):
             print self.get_features(type(action))
 
         if isinstance(action, actions.GoMating):
-            features = {"age": float(self.age),
-                        "self_num_substance": float(self.count_substance_of_type(substances.Substance)),
-                        "partner_num_substance": float(
+            features = [float(self.age),
+                        float(self.has_state(states.NotTheRightMood)),
+                        float(
                             actions.SearchMatingPartner(self).do_results()["partner"].count_substance_of_type(
                                 substances.Substance)),
-                        "not_in_mood": float(self.has_state(states.NotTheRightMood))}
+                        float(self.count_substance_of_type(substances.Substance))]
 
             self.private_learning_memory.save_state(features, action)
             self.public_memory.save_state(features, action)
@@ -361,15 +366,14 @@ class Creature(Entity):
                 return random.random() < 1. * partner_has_substance / (self_has_substance*3 + partner_has_substance)
 
     def update_decision_model(self):
-        table_list_of_dicts = self.private_learning_memory.make_table(actions.GoMating)
-        if len(table_list_of_dicts) > 5:
-            df_train = pandas.DataFrame.from_dict(*[table_list_of_dicts])
-            # df_train.drop(df_train.columns[0], axis=1, inplace=True)
-            y_train = df_train.pop('target')
+        table_list = self.private_learning_memory.make_table(actions.GoMating)
+        if len(table_list) > 2:
+            df_train = pandas.DataFrame(table_list)
+            y_train = df_train.pop(4)
             X_train = df_train
-            # print X_train
             self.decision_model.fit(X_train, y_train)
             self.private_learning_memory = brain.LearningMemory(self)
+            print "UPDATE SUCCESSFULL"
 
     def set_memorize_task(self, action_types, features_list, target):
         if isinstance(action_types, list):

@@ -22,6 +22,22 @@ class LearningMemory(object):
             if isinstance(memory, action_type):
                 if "state" not in self.memories[memory] or "results" not in self.memories[memory]:
                     continue
+                row = self.memories[memory]["state"][:]
+                row.append(self.memories[memory]["results"])
+                table_list.append(row)
+
+                # for element in self.memories[memory]["state"]:
+                #     row_dict[element] = self.memories[memory]["state"][element]
+                # row_dict["target"] = self.memories[memory]["results"]
+
+        return table_list
+
+    def _make_table(self, action_type):
+        table_list = []
+        for memory in self.memories:
+            if isinstance(memory, action_type):
+                if "state" not in self.memories[memory] or "results" not in self.memories[memory]:
+                    continue
                 row_dict = {}
                 for element in self.memories[memory]["state"]:
                     row_dict[element] = self.memories[memory]["state"][element]
@@ -65,16 +81,18 @@ class TestLearningMemory(unittest.TestCase):
                                                                 "action": 88})
 
     def test_make_table(self):
-        self.mem.save_state({"foo": 1, "bar": 2}, 12)
-        self.mem.save_state({"foo": 6, "bar": 4}, 65)
-        self.mem.save_state({"spam": 1, "eggs": 2, "time": 55}, "42")
+        self.mem.save_state([1, 2], 12)
+        self.mem.save_state([6, 4], 65)
+        self.mem.save_state([1, 2, 55], "42")
         results = {"done": True, "accomplished": False}
         self.mem.save_results(results, 65)
         results = {"done": True, "accomplished": True}
         self.mem.save_results(results, 12)
 
-        self.assertEqual(self.mem.make_table(int), [{'foo': 6, 'bar': 4, 'target': False},
-                                                    {'foo': 1, 'bar': 2, 'target': True}])
+        print self.mem.make_table(int)
+
+        self.assertEqual(self.mem.make_table(int), [[6, 4, False],
+                                                    [1, 2, True]])
 
 
 if __name__ == '__main__':

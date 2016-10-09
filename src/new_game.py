@@ -62,12 +62,12 @@ def main():
     # c.mortal = False
     # g.mortal = False
     #
-    # brg = BreedingGround()
+    brg = BreedingGround()
     #
     # f.insert_object(5, 2, c)
     # f.insert_object(30, 20, g)
     # f.insert_object(3, 4, b)
-    # f.insert_object(10, 15, brg)
+    f.insert_object(10, 15, brg)
 
     f.populate(entities.Creature, 20)
 
