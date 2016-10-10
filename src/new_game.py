@@ -49,6 +49,8 @@ def main():
 
     # <editor-fold desc="Field">
     f = Field(60, 40)
+    demiurge = field.Demiurge()
+    f.set_demiurge(demiurge)
 
     # b = Block()
     # c = Creature()

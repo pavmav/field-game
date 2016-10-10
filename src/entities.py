@@ -10,10 +10,6 @@ from sklearn.externals import joblib
 import numpy as np
 import pandas
 
-# TODO
-def nearest_partner_has_substance(entity):
-    return float(actions.SearchMatingPartner(entity).do_results()["partner"].count_substance_of_type(substances.Substance))
-
 
 class Entity(object):
     def __init__(self):
@@ -193,21 +189,6 @@ class Creature(Entity):
         self.memorize_tasks = {}
         self.chosen_action = None
 
-        # TODO
-        if self.sex:
-            features = [{"func": lambda self: float(self.age),
-                         "kwargs": {"self": self}},
-                        {"func": lambda self: float(self.has_state(states.NotTheRightMood)),
-                         "kwargs": {"self": self}},
-                        {"func": nearest_partner_has_substance,
-                         "kwargs": {"entity": self}},
-                        {"func": lambda self: float(self.count_substance_of_type(substances.Substance)),
-                         "kwargs": {"self": self}}]
-
-            self.set_memorize_task(actions.GoMating, features,
-                                   {"func": lambda self: self.chosen_action.results["accomplished"],
-                                    "kwargs": {"self": self}})
-
     def __str__(self):
         return '@'
 
@@ -269,6 +250,8 @@ class Creature(Entity):
                 features = np.asarray(features)
 
                 features = features.reshape(1, -1)
+
+                # print features
 
                 if self.public_decision_model.predict(features):
                     go_mating = actions.GoMating(self)
@@ -358,6 +341,9 @@ class Creature(Entity):
             df_train = pandas.DataFrame(table_list)
             y_train = df_train.pop(4)
             X_train = df_train
+            n_estimators = self.public_decision_model.get_params()["n_estimators"]
+            print n_estimators
+            self.public_decision_model.set_params(**{"warm_start": False})  # TODO warm-start
             self.public_decision_model.fit(X_train, y_train)
             self.private_learning_memory = brain.LearningMemory(self)
             print "UPDATE SUCCESSFULL"

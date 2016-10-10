@@ -30,8 +30,8 @@ class Field(object):
         self.__field = []
         self.__epoch = 0
         self.pause = False
-        self.public_memory = brain.LearningMemory(self)
-        self.public_decision_model = joblib.load("mating_model/dt_model")
+
+        self.demiurge = None
 
         for y in range(self.__height):
             row = []
@@ -95,6 +95,12 @@ class Field(object):
         return representation
 
     def insert_object(self, x, y, entity_object, epoch=0):
+        if self.demiurge is not None:
+            refuse = False
+            self.demiurge.handle_creation(entity_object, refuse)
+            if refuse:
+                return
+
         assert x < self.length
         assert y < self.height
 
@@ -108,10 +114,6 @@ class Field(object):
         entity_object.board = self
         entity_object.x = x
         entity_object.y = y
-
-        if isinstance(entity_object, entities.Creature):
-            entity_object.public_memory = self.public_memory
-            entity_object.public_decision_model = self.public_decision_model
 
     def remove_object(self, entity_object, x=None, y=None):
         if x is not None and y is not None:
@@ -351,6 +353,38 @@ class Field(object):
                 self.insert_object(x, y, entity_type())
             else:
                 i -= 1
+
+    def set_demiurge(self, demiurge):
+        self.demiurge = demiurge
+
+class Demiurge(object):
+    def __init__(self):
+        self.public_memory = brain.LearningMemory(self)
+        self.public_decision_model = joblib.load("mating_model/dt_model")
+
+    def handle_creation(self, creation, refuse):
+        if isinstance(creation, entities.Creature):
+            creation.public_memory = self.public_memory
+            creation.public_decision_model = self.public_decision_model
+
+            if creation.sex:
+
+                def nearest_partner_has_substance(entity):
+                    return float(actions.SearchMatingPartner(entity).do_results()["partner"].count_substance_of_type(
+                        substances.Substance))
+
+                features = [{"func": lambda creation: float(creation.age),
+                             "kwargs": {"creation": creation}},
+                            {"func": lambda creation: float(creation.has_state(states.NotTheRightMood)),
+                             "kwargs": {"creation": creation}},
+                            {"func": nearest_partner_has_substance,
+                             "kwargs": {"entity": creation}},
+                            {"func": lambda creation: float(creation.count_substance_of_type(substances.Substance)),
+                             "kwargs": {"creation": creation}}]
+
+                creation.set_memorize_task(actions.GoMating, features,
+                                           {"func": lambda creation: creation.chosen_action.results["accomplished"],
+                                           "kwargs": {"creation": creation}})
 
 
 def load_from_pickle(filename):
