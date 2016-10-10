@@ -386,6 +386,38 @@ class Demiurge(object):
                                            {"func": lambda creation: creation.chosen_action.results["accomplished"],
                                            "kwargs": {"creation": creation}})
 
+            def plan(creature):
+
+                if creature.sex:
+
+                    find_partner = actions.SearchMatingPartner(creature)
+
+                    search_results = find_partner.do_results()
+
+                    if search_results["accomplished"]:
+
+                        features = creature.get_features(actions.GoMating)
+
+                        features = np.asarray(features)
+
+                        features = features.reshape(1, -1)
+
+                        if creature.public_decision_model.predict(features):
+                            go_mating = actions.GoMating(creature)
+                            creature.queue_action(go_mating)
+                            return
+                        else:
+                            harvest_substance = actions.HarvestSubstance(creature)
+                            harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+                            creature.queue_action(harvest_substance)
+                            return
+                else:
+                    harvest_substance = actions.HarvestSubstance(creature)
+                    harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
+                    creature.queue_action(harvest_substance)
+
+            creation.plan_callable = plan
+
 
 def load_from_pickle(filename):
     with open(filename, 'rb') as f:

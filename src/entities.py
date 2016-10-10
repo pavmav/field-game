@@ -186,6 +186,8 @@ class Creature(Entity):
         self.private_decision_model = joblib.load("mating_model/dt_model")
         self.public_decision_model = None
 
+        self.plan_callable = None
+
         self.memorize_tasks = {}
         self.chosen_action = None
 
@@ -237,35 +239,9 @@ class Creature(Entity):
 
     def plan(self):
 
-        if self.sex:
-
-            find_partner = actions.SearchMatingPartner(self)
-
-            search_results = find_partner.do_results()
-
-            if search_results["accomplished"]:
-
-                features = self.get_features(actions.GoMating)
-
-                features = np.asarray(features)
-
-                features = features.reshape(1, -1)
-
-                # print features
-
-                if self.public_decision_model.predict(features):
-                    go_mating = actions.GoMating(self)
-                    self.queue_action(go_mating)
-                    return
-                else:
-                    harvest_substance = actions.HarvestSubstance(self)
-                    harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-                    self.queue_action(harvest_substance)
-                    return
-        else:
-            harvest_substance = actions.HarvestSubstance(self)
-            harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-            self.queue_action(harvest_substance)
+        if self.plan_callable is not None:
+            self.plan_callable(self)
+            return
 
     def die(self):
         if not self.mortal:
