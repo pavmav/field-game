@@ -7,6 +7,7 @@ import states
 import substances
 from sklearn.externals import joblib
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.exceptions import NotFittedError
 import numpy as np
 import random
@@ -15,12 +16,15 @@ import random
 class Priapus(field.Demiurge):  # Create deity
     def __init__(self):
         self.public_memory = brain.LearningMemory(self)
-        self.public_decision_model = RandomForestClassifier()#warm_start=True)
+        self.public_decision_model = SGDClassifier(warm_start=True)
 
     def handle_creation(self, creation, refuse):
         if isinstance(creation, entities.Creature):
             creation.public_memory = self.public_memory
             creation.public_decision_model = self.public_decision_model
+            creation.memory_type = "public"
+            creation.model_type = "public"
+            creation.memory_batch_size = 20
 
             if creation.sex:
 
@@ -28,9 +32,7 @@ class Priapus(field.Demiurge):  # Create deity
                     return float(actions.SearchMatingPartner(entity).do_results()["partner"].count_substance_of_type(
                         substances.Substance))
 
-                features = [{"func": lambda creation: float(creation.age),
-                             "kwargs": {"creation": creation}},
-                            {"func": lambda creation: float(creation.has_state(states.NotTheRightMood)),
+                features = [{"func": lambda creation: float(creation.has_state(states.NotTheRightMood)),
                              "kwargs": {"creation": creation}},
                             {"func": nearest_partner_has_substance,
                              "kwargs": {"entity": creation}},

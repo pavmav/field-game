@@ -28,6 +28,8 @@ class LearningMemory(object):
 
         return table_list
 
+    def obliviate(self):
+        self.memories = {}
 
 class TestLearningMemory(unittest.TestCase):
     def setUp(self):

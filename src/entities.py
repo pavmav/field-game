@@ -188,6 +188,11 @@ class Creature(Entity):
 
         self.plan_callable = None
 
+        self.memory_type = ""
+        self.model_type = ""
+
+        self.memory_batch_size = 1
+
         self.memorize_tasks = {}
         self.chosen_action = None
 
@@ -312,16 +317,30 @@ class Creature(Entity):
                 return random.random() < 1. * partner_has_substance / (self_has_substance*3 + partner_has_substance)
 
     def update_decision_model(self):
-        table_list = self.private_learning_memory.make_table(actions.GoMating)
-        if len(table_list) > 10:
+        model_to_use = None
+        memory_to_use = None
+
+        if self.memory_type == "public":
+            memory_to_use = self.public_memory
+        elif self.memory_type == "private":
+            memory_to_use = self.private_learning_memory
+
+        if self.model_type == "public":
+            model_to_use = self.public_decision_model
+        elif self.model_type == "private":
+            model_to_use = self.private_decision_model
+
+        if memory_to_use is None or model_to_use is None:
+            raise Exception("You should set memory and model types ('public' or 'private')")
+
+        table_list = memory_to_use.make_table(actions.GoMating)
+        if len(table_list) >= self.memory_batch_size:
             df_train = pandas.DataFrame(table_list)
-            y_train = df_train.pop(4)
+            print df_train
+            y_train = df_train.pop(len(table_list[0])-1)
             X_train = df_train
-            # n_estimators = self.public_decision_model.get_params()["n_estimators"]
-            # # print n_estimators
-            # self.public_decision_model.set_params(**{"n_estimators": n_estimators + 1})  # TODO warm-start
-            self.public_decision_model.fit(X_train, y_train)
-            self.private_learning_memory = brain.LearningMemory(self)
+            model_to_use.fit(X_train, y_train)
+            memory_to_use.obliviate()
             print "UPDATE SUCCESSFULL"
 
     def set_memorize_task(self, action_types, features_list, target):
