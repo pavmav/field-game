@@ -26,24 +26,6 @@ class LearningMemory(object):
                 row.append(self.memories[memory]["results"])
                 table_list.append(row)
 
-                # for element in self.memories[memory]["state"]:
-                #     row_dict[element] = self.memories[memory]["state"][element]
-                # row_dict["target"] = self.memories[memory]["results"]
-
-        return table_list
-
-    def _make_table(self, action_type):
-        table_list = []
-        for memory in self.memories:
-            if isinstance(memory, action_type):
-                if "state" not in self.memories[memory] or "results" not in self.memories[memory]:
-                    continue
-                row_dict = {}
-                for element in self.memories[memory]["state"]:
-                    row_dict[element] = self.memories[memory]["state"][element]
-                row_dict["target"] = self.memories[memory]["results"]
-                table_list.append(row_dict)
-
         return table_list
 
 

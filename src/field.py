@@ -3,9 +3,6 @@
 from entities import *
 import pickle
 import threading
-import brain
-import entities
-from sklearn.externals import joblib
 
 import cProfile
 
@@ -21,7 +18,6 @@ def profile(func):
         return result
 
     return wrapper
-
 
 class Field(object):
     def __init__(self, length, height):
@@ -357,67 +353,10 @@ class Field(object):
     def set_demiurge(self, demiurge):
         self.demiurge = demiurge
 
+
 class Demiurge(object):
-    def __init__(self):
-        self.public_memory = brain.LearningMemory(self)
-        self.public_decision_model = joblib.load("mating_model/dt_model")
-
     def handle_creation(self, creation, refuse):
-        if isinstance(creation, entities.Creature):
-            creation.public_memory = self.public_memory
-            creation.public_decision_model = self.public_decision_model
-
-            if creation.sex:
-
-                def nearest_partner_has_substance(entity):
-                    return float(actions.SearchMatingPartner(entity).do_results()["partner"].count_substance_of_type(
-                        substances.Substance))
-
-                features = [{"func": lambda creation: float(creation.age),
-                             "kwargs": {"creation": creation}},
-                            {"func": lambda creation: float(creation.has_state(states.NotTheRightMood)),
-                             "kwargs": {"creation": creation}},
-                            {"func": nearest_partner_has_substance,
-                             "kwargs": {"entity": creation}},
-                            {"func": lambda creation: float(creation.count_substance_of_type(substances.Substance)),
-                             "kwargs": {"creation": creation}}]
-
-                creation.set_memorize_task(actions.GoMating, features,
-                                           {"func": lambda creation: creation.chosen_action.results["accomplished"],
-                                           "kwargs": {"creation": creation}})
-
-            def plan(creature):
-
-                if creature.sex:
-
-                    find_partner = actions.SearchMatingPartner(creature)
-
-                    search_results = find_partner.do_results()
-
-                    if search_results["accomplished"]:
-
-                        features = creature.get_features(actions.GoMating)
-
-                        features = np.asarray(features)
-
-                        features = features.reshape(1, -1)
-
-                        if creature.public_decision_model.predict(features):
-                            go_mating = actions.GoMating(creature)
-                            creature.queue_action(go_mating)
-                            return
-                        else:
-                            harvest_substance = actions.HarvestSubstance(creature)
-                            harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-                            creature.queue_action(harvest_substance)
-                            return
-                else:
-                    harvest_substance = actions.HarvestSubstance(creature)
-                    harvest_substance.set_objective(**{"target_substance_type": type(substances.Substance())})
-                    creature.queue_action(harvest_substance)
-
-            creation.plan_callable = plan
-
+        pass
 
 def load_from_pickle(filename):
     with open(filename, 'rb') as f:

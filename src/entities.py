@@ -183,7 +183,7 @@ class Creature(Entity):
         self.private_learning_memory = brain.LearningMemory(self)
         self.public_memory = None
 
-        self.private_decision_model = joblib.load("mating_model/dt_model")
+        self.private_decision_model = None
         self.public_decision_model = None
 
         self.plan_callable = None
@@ -207,7 +207,7 @@ class Creature(Entity):
         if not self.alive:
             return
 
-        if random.random() <= 0.0005 and self.age > 10:
+        if random.random() <= 0.001 and self.age > 10:
             self.die()
             return
 
@@ -313,13 +313,13 @@ class Creature(Entity):
 
     def update_decision_model(self):
         table_list = self.private_learning_memory.make_table(actions.GoMating)
-        if len(table_list) > 5:
+        if len(table_list) > 10:
             df_train = pandas.DataFrame(table_list)
             y_train = df_train.pop(4)
             X_train = df_train
-            n_estimators = self.public_decision_model.get_params()["n_estimators"]
-            print n_estimators
-            self.public_decision_model.set_params(**{"warm_start": False})  # TODO warm-start
+            # n_estimators = self.public_decision_model.get_params()["n_estimators"]
+            # # print n_estimators
+            # self.public_decision_model.set_params(**{"n_estimators": n_estimators + 1})  # TODO warm-start
             self.public_decision_model.fit(X_train, y_train)
             self.private_learning_memory = brain.LearningMemory(self)
             print "UPDATE SUCCESSFULL"

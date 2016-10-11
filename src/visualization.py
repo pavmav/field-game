@@ -29,9 +29,7 @@ def visualize(field):
 
     # <editor-fold desc="Field">
     f = field
-
     tick = 10
-
     # </editor-fold>
 
     timer = pygame.time.Clock()
@@ -80,7 +78,6 @@ def visualize(field):
         #     f.pause = True
         f.integrity_check()
         f.make_time()
-        # f.save_pickle("__field.pickle")
         level = f.list_obj_representation()
         # </editor-fold>
 
